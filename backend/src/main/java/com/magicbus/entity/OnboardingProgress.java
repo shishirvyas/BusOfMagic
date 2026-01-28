@@ -2,13 +2,11 @@ package com.magicbus.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "onboarding_progress", indexes = {
-    @Index(name = "idx_onboarding_progress_candidate", columnList = "candidate_id"),
-    @Index(name = "idx_onboarding_progress_overall", columnList = "overall_completed")
-})
+@Table(name = "onboarding_progress")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,43 +22,33 @@ public class OnboardingProgress {
     private Candidate candidate;
     
     // Signup Step Status
-    @Column(nullable = false)
     @Builder.Default
     private Boolean signupCompleted = false;
-    
-    @Column
     private LocalDateTime signupCompletedAt;
     
     // Personal Details Step Status
-    @Column(nullable = false)
     @Builder.Default
     private Boolean personalDetailsCompleted = false;
-    
-    @Column
     private LocalDateTime personalDetailsCompletedAt;
     
     // Education Details Step Status
-    @Column(nullable = false)
     @Builder.Default
     private Boolean educationDetailsCompleted = false;
-    
-    @Column
     private LocalDateTime educationDetailsCompletedAt;
     
     // Skills Step Status
-    @Column(nullable = false)
     @Builder.Default
     private Boolean skillsCompleted = false;
-    
-    @Column
     private LocalDateTime skillsCompletedAt;
     
+    // Questions Step Status
+    @Builder.Default
+    private Boolean questionsCompleted = false;
+    private LocalDateTime questionsCompletedAt;
+    
     // Overall Status
-    @Column(nullable = false)
     @Builder.Default
     private Boolean overallCompleted = false;
-    
-    @Column
     private LocalDateTime overallCompletedAt;
     
     // Progress Tracking
@@ -69,13 +57,12 @@ public class OnboardingProgress {
     
     @Column(precision = 3, scale = 0)
     @Builder.Default
-    private Long progressPercentage = 0L;
+    private BigDecimal progressPercentage = BigDecimal.ZERO;
     
-    @Column(name = "created_at", updatable = false)
+    @Column(updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
     
-    @Column(name = "updated_at")
     @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

@@ -268,11 +268,7 @@ export default function Onboarding() {
       }
 
       setSuccess(true)
-
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        window.location.href = '/dashboard'
-      }, 2000)
+      // No redirect - show thank you message instead
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -308,13 +304,51 @@ export default function Onboarding() {
           minHeight: '60vh',
         }}
       >
-        <Card sx={{ maxWidth: 500 }}>
-          <CardContent sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="h5" color="success.main" sx={{ mb: 2 }}>
-              ✓ Profile Completed Successfully!
+        <Card sx={{ maxWidth: 600 }}>
+          <CardContent sx={{ textAlign: 'center', py: 5, px: 4 }}>
+            <Typography variant="h4" color="success.main" sx={{ mb: 2, fontWeight: 600 }}>
+              🎉 Thank You!
             </Typography>
-            <Typography color="textSecondary">
-              Redirecting to dashboard...
+            <Typography variant="h6" sx={{ mb: 3, color: 'text.primary' }}>
+              Your profile has been completed successfully!
+            </Typography>
+            <Typography variant="body1" sx={{ mb: 3, color: 'text.secondary' }}>
+              Thank you for registering with Magic Bus. Our team will review your profile and get in touch with you soon.
+            </Typography>
+            
+            <Box sx={{ 
+              bgcolor: 'grey.100', 
+              borderRadius: 2, 
+              p: 3, 
+              mb: 3 
+            }}>
+              <Typography variant="body1" sx={{ mb: 2, fontWeight: 500 }}>
+                For more information, visit our website:
+              </Typography>
+              <Button
+                variant="contained"
+                color="primary"
+                href="https://www.magicbus.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ mb: 2 }}
+              >
+                Visit Magic Bus
+              </Button>
+              
+              <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
+                Or contact us for more details:
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 1 }}>
+                📧 Email: <a href="mailto:info@magicbus.org" style={{ color: '#1976d2' }}>info@magicbus.org</a>
+              </Typography>
+              <Typography variant="body1" sx={{ mt: 0.5 }}>
+                📞 Phone: <a href="tel:+911234567890" style={{ color: '#1976d2' }}>+91 1234 567 890</a>
+              </Typography>
+            </Box>
+            
+            <Typography variant="caption" color="text.secondary">
+              We look forward to helping you achieve your goals!
             </Typography>
           </CardContent>
         </Card>

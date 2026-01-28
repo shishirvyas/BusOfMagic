@@ -7,15 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "candidate", indexes = {
-    @Index(name = "idx_candidate_phone", columnList = "phone_number"),
-    @Index(name = "idx_candidate_status", columnList = "status"),
-    @Index(name = "idx_candidate_dropout_risk", columnList = "dropout_risk_score"),
-    @Index(name = "idx_candidate_engagement", columnList = "engagement_score"),
-    @Index(name = "idx_candidate_created_at", columnList = "created_at"),
-    @Index(name = "idx_candidate_city_state", columnList = "city, state"),
-    @Index(name = "idx_candidate_age", columnList = "date_of_birth")
-})
+@Table(name = "candidate")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,10 +28,10 @@ public class Candidate {
     @Column(length = 100, nullable = false)
     private String lastName;
     
-    @Column(length = 255)
+    @Column(length = 255, unique = true)
     private String email;
     
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, unique = true)
     private String phoneNumber;
     
     @Column(length = 20)
@@ -65,11 +57,12 @@ public class Candidate {
     private String pincode;
     
     @Column(length = 100)
+    @Builder.Default
     private String country = "India";
     
     // Demographics
     @Column(length = 20, nullable = false)
-    private String gender;  // MALE, FEMALE, OTHER, PREFER_NOT_TO_SAY
+    private String gender;
     
     @Column(length = 100)
     private String motherTongue;
@@ -81,7 +74,7 @@ public class Candidate {
     private String caste;
     
     @Column(length = 20)
-    private String maritalStatus;  // SINGLE, MARRIED, DIVORCED, WIDOWED
+    private String maritalStatus;
     
     // Family Information
     @Column(length = 255)
@@ -99,66 +92,38 @@ public class Candidate {
     @Column(length = 255)
     private String motherName;
     
-    @Column(precision = 10, scale = 2)
-    private BigDecimal familyMonthlyIncome;
+    // Identification Documents
+    @Column(length = 20)
+    private String aadharNumber;
     
-    private Integer numberOfSiblings;
+    @Column(length = 20)
+    private String panNumber;
     
-    // Mobilisation
-    @ManyToOne
-    @JoinColumn(name = "mobilisation_source_id")
-    private MobilisationSource mobilisationSource;
-    
-    @Column(length = 255)
-    private String mobilisedBy;
-    
-    private LocalDate mobilisationDate;
-    
-    // Profile Status
-    @Column(length = 50, nullable = false)
-    private String status = "REGISTERED";  // REGISTERED, ACTIVE, INACTIVE, GRADUATED, DROPOUT, PLACED
-    
-    @Column(name = "profile_completion_percentage")
-    private Integer profileCompletionPercentage = 0;
-    
-    // AI-Related Fields
-    @Column(precision = 5, scale = 2)
-    private BigDecimal engagementScore = BigDecimal.valueOf(50.00);  // 0-100
-    
-    @Column(precision = 5, scale = 2)
-    private BigDecimal dropoutRiskScore = BigDecimal.ZERO;  // 0-100
+    // Status & Tracking
+    @Column(length = 50)
+    @Builder.Default
+    private String status = "ACTIVE";
     
     @Column(length = 50)
-    private String riskCategory = "LOW";  // LOW, MEDIUM, HIGH
+    @Builder.Default
+    private String onboardingStatus = "INCOMPLETE";
     
-    @Column(length = 50)
-    private String recommendationStatus;  // ONBOARD, MONITOR, INTERVENTION_NEEDED
+    // Scoring & Engagement
+    @Column(precision = 5, scale = 2)
+    @Builder.Default
+    private BigDecimal dropoutRiskScore = BigDecimal.ZERO;
     
-    @Column(name = "ai_prediction_date")
-    private LocalDateTime aiPredictionDate;
-    
-    @Column(name = "ai_prediction_model_version", length = 50)
-    private String aiPredictionModelVersion;
-    
-    // Activity Tracking
-    @Column(name = "last_login")
-    private LocalDateTime lastLogin;
-    
-    @Column(name = "login_count")
-    private Integer loginCount = 0;
+    @Column(precision = 5, scale = 2)
+    @Builder.Default
+    private BigDecimal engagementScore = BigDecimal.ZERO;
     
     // Timestamps
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
     
-    @Column(name = "updated_at")
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
-    
-    @Column(name = "created_by")
-    private String createdBy;
-    
-    @Column(name = "updated_by")
-    private String updatedBy;
     
     // Relationships
     @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL)

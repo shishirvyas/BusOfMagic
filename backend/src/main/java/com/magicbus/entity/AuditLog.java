@@ -5,10 +5,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "audit_log", indexes = {
-    @Index(name = "idx_audit_log_entity", columnList = "entity_type, entity_id"),
-    @Index(name = "idx_audit_log_timestamp", columnList = "created_at")
-})
+@Table(name = "audit_log")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,30 +16,31 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(length = 100, nullable = false)
-    private String entityType;  // CANDIDATE, PLACEMENT, ASSESSMENT, etc.
-    
-    @Column(nullable = false)
-    private Long entityId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "candidate_id")
+    private Candidate candidate;
     
     @Column(length = 50, nullable = false)
-    private String actionType;  // CREATE, UPDATE, DELETE, VIEW
+    private String actionType;
+    
+    @Column(length = 100, nullable = false)
+    private String entityType;
+    
+    private Long entityId;
     
     @Column(columnDefinition = "TEXT")
-    private String oldValues;  // JSON of previous values
+    private String oldValues;
     
     @Column(columnDefinition = "TEXT")
-    private String newValues;  // JSON of new values
+    private String newValues;
     
-    @Column(columnDefinition = "TEXT")
-    private String changedFields;  // JSON array
-    
-    @Column(length = 255)
-    private String performedBy;
-    
-    @Column(name = "ip_address", length = 45)
+    @Column(length = 45)
     private String ipAddress;
     
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(columnDefinition = "TEXT")
+    private String userAgent;
+    
+    @Column(updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 }

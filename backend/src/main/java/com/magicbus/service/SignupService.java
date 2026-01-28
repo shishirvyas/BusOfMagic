@@ -337,7 +337,7 @@ public class SignupService {
         progress.setSignupCompletedAt(LocalDateTime.now());
         progress.setOverallCompleted(true);
         progress.setOverallCompletedAt(LocalDateTime.now());
-        progress.setProgressPercentage(100L);
+        progress.setProgressPercentage(new java.math.BigDecimal(100));
         progress.setUpdatedAt(LocalDateTime.now());
         
         onboardingProgressRepository.save(progress);
@@ -381,7 +381,7 @@ public class SignupService {
         if (progress.getPersonalDetailsCompleted()) completedSteps++;
         if (progress.getEducationDetailsCompleted()) completedSteps++;
         if (progress.getSkillsCompleted()) completedSteps++;
-        progress.setProgressPercentage((long) (completedSteps * 33));
+        progress.setProgressPercentage(new java.math.BigDecimal(completedSteps * 33));
         
         progress.setUpdatedAt(LocalDateTime.now());
         onboardingProgressRepository.save(progress);
