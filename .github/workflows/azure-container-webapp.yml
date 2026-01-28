@@ -41,13 +41,12 @@ jobs:
     - name: Set up Node.js (for example, if frontend is React or Angular)
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '18'
 
     - name: Install dependencies for Frontend
       run: |
         cd frontend
-        npm install
-        npm install @types/node --save-dev
+        npm install --save-dev vite @vitejs/plugin-react typescript @types/react @types/react-dom
         npm fund
         npm audit fix --force
         npm run build
