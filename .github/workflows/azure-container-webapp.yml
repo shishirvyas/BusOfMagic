@@ -36,24 +36,21 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
-        node-version: '14'  # Set the Node.js version you use
+        node-version: '18'  # Using Node.js 18 for better compatibility
 
     - name: Install dependencies for Frontend
       run: |
-        cd frontend
         npm install
-        # Install @types/node to resolve path module issues
         npm install @types/node --save-dev
 
-    - name: Build Frontend (if needed)
+    - name: Build Frontend
       run: |
-        cd frontend
-        npm run build  # Adjust for your frontend (e.g., Vite, Webpack)
+        npm run build
 
     - name: Deploy Frontend to Azure App Service
       uses: azure/webapps-deploy@v2
@@ -61,3 +58,4 @@ jobs:
         app-name: <frontend-app-service-name>  # Replace with your Azure App Service name
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Store this in GitHub secrets
+        package: ./buildn GitHub secrets
