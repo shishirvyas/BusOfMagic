@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -18,12 +18,23 @@ import { useAdminAuth } from '@/context/AdminAuthContext';
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { login, isLoading } = useAdminAuth();
   
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [sessionExpiredMessage, setSessionExpiredMessage] = useState('');
+
+  // Check if session expired
+  useEffect(() => {
+    if (searchParams.get('expired') === 'true') {
+      setSessionExpiredMessage('Your session has expired. Please login again.');
+      // Clear the expired param from URL
+      window.history.replaceState({}, document.title, '/login');
+    }
+  }, [searchParams]);
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
 
@@ -94,6 +105,13 @@ export default function Login() {
           >
             Sign in to access the dashboard
           </Typography>
+
+          {/* Session Expired Alert */}
+          {sessionExpiredMessage && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              {sessionExpiredMessage}
+            </Alert>
+          )}
 
           {/* Error Alert */}
           {error && (

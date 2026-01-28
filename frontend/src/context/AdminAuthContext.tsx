@@ -1,8 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginResponse, MenuItem } from '@/types/auth.types';
 import { authApi, menuApi } from '@/services/auth.service';
-import { onSessionExpired, clearAuthData } from '@/utils/api';
+import { onSessionExpired } from '@/utils/api';
 
 // User context type for state/city mapping
 export interface UserContext {

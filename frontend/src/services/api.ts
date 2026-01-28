@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios'
+import { dispatchSessionExpired } from '@/utils/api'
 
 const API_BASE_URL = 'http://localhost:8080/api'
 
@@ -51,6 +52,17 @@ apiClient.interceptors.response.use(
     return response
   },
   (error: AxiosError) => {
+    // Handle session expiration (401 Unauthorized or 403 Forbidden)
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.log('Session expired - dispatching session expired event');
+      dispatchSessionExpired();
+      return Promise.reject({
+        success: false,
+        message: 'Session expired. Please login again.',
+        error: 'SESSION_EXPIRED',
+      });
+    }
+
     // Handle different error types
     if (!error.response) {
       // Network error or no response from server

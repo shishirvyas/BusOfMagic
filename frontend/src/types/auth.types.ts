@@ -5,6 +5,7 @@ export interface Permission {
   code: string;
   description?: string;
   module?: string;
+  isActive?: boolean;
 }
 
 export interface Role {
