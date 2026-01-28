@@ -2,7 +2,10 @@ package com.magicbus.service;
 
 import com.magicbus.dto.*;
 import com.magicbus.entity.*;
+import com.magicbus.entity.workflow.CandidateWorkflow;
+import com.magicbus.entity.workflow.WorkflowStatus;
 import com.magicbus.repository.*;
+import com.magicbus.repository.workflow.CandidateWorkflowRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,6 +30,7 @@ public class SignupService {
     private final CandidateLanguageRepository candidateLanguageRepository;
     private final OnboardingProgressRepository onboardingProgressRepository;
     private final AuditLogRepository auditLogRepository;
+    private final CandidateWorkflowRepository candidateWorkflowRepository;
     
     // Constants
     private static final int OTP_VALIDITY_MINUTES = 10;
@@ -446,6 +450,7 @@ public class SignupService {
     
     /**
      * Step 6: Complete signup
+     * Sets onboardingStatus to COMPLETED and creates workflow entry for screening
      */
     public void completeSignup(Long candidateId) {
         log.info("Completing signup for candidate: {}", candidateId);
@@ -453,9 +458,25 @@ public class SignupService {
         Candidate candidate = candidateRepository.findById(candidateId)
             .orElseThrow(() -> new RuntimeException("Candidate not found"));
         
-        // Update candidate status to ACTIVE
+        // Update candidate status to ACTIVE and onboarding status to COMPLETED
         candidate.setStatus("ACTIVE");
+        candidate.setOnboardingStatus("COMPLETED");
+        candidate.setUpdatedAt(LocalDateTime.now());
         candidateRepository.save(candidate);
+        
+        // Create workflow entry for screening (if not already exists)
+        if (!candidateWorkflowRepository.existsByCandidateId(candidateId)) {
+            CandidateWorkflow workflow = CandidateWorkflow.builder()
+                .candidate(candidate)
+                .status(WorkflowStatus.PENDING_SCREENING)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
+            candidateWorkflowRepository.save(workflow);
+            log.info("Created workflow entry for candidate {} with status PENDING_SCREENING", candidateId);
+        } else {
+            log.info("Workflow entry already exists for candidate {}", candidateId);
+        }
         
         // Update onboarding progress
         OnboardingProgress progress = onboardingProgressRepository.findByCandidateId(candidateId)
