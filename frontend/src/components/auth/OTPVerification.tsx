@@ -22,7 +22,6 @@ interface OTPVerificationProps {
   isLoading?: boolean
 }
 
-const VALID_OTP = '0000'
 const OTP_RESEND_TIME = 30 // seconds
 
 export default function OTPVerification({
@@ -56,16 +55,13 @@ export default function OTPVerification({
       return
     }
 
-    if (otp.length !== 4) {
-      setError('OTP must be 4 digits')
+    if (otp.length < 4) {
+      setError('OTP must be at least 4 digits')
       return
     }
 
-    if (otp === VALID_OTP) {
-      onVerify(otp)
-    } else {
-      setError('Invalid OTP. Please try again. (Hint: OTP is 0000)')
-    }
+    // Let backend validate the OTP
+    onVerify(otp)
   }
 
   const handleResend = () => {

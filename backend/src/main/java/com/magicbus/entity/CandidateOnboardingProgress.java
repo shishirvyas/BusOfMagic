@@ -26,9 +26,11 @@ public class CandidateOnboardingProgress {
     
     // Progress Status
     @Column(length = 50, nullable = false)
+    @Builder.Default
     private String status = "PENDING";  // PENDING, IN_PROGRESS, COMPLETED, SKIPPED
     
     @Column(name = "completion_percentage")
+    @Builder.Default
     private Integer completionPercentage = 0;
     
     // Timestamps
@@ -48,9 +50,11 @@ public class CandidateOnboardingProgress {
     @Column(name = "assigned_to", length = 255)
     private String assignedTo;
     
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @Column(name = "updated_at")
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

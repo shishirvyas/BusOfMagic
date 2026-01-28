@@ -19,6 +19,8 @@ import ReviewForm from '@components/onboarding/ReviewForm'
 type OnboardingStep = 'personal' | 'education' | 'skills' | 'review'
 
 interface OnboardingData {
+  candidateId?: number
+
   // Personal Details
   firstName: string
   lastName: string
@@ -103,17 +105,99 @@ export default function Onboarding() {
     try {
       const finalData = { ...formData, ...finalStepData }
 
-      // Call backend API
-      const response = await fetch('/api/candidates/onboard', {
+      // Get candidateId from localStorage (set after OTP verification)
+      const candidateId = finalData.candidateId || localStorage.getItem('candidateId')
+      if (!candidateId) {
+        throw new Error('Candidate ID not found. Please start from signup.')
+      }
+
+      // Step 1: Save Personal Details
+      let personalResponse = await fetch('/api/signup/personal-details', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(finalData),
+        body: JSON.stringify({
+          candidateId: Number(candidateId),
+          firstName: finalData.firstName,
+          lastName: finalData.lastName,
+          email: finalData.email,
+          phone: finalData.phone,
+          dateOfBirth: finalData.dateOfBirth,
+          gender: finalData.gender,
+          address: finalData.address,
+          city: finalData.city,
+          state: finalData.state,
+          pincode: finalData.pincode,
+          aadhar: finalData.aadhar,
+          pan: finalData.pan,
+          bankAccount: finalData.bankAccount,
+        }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to onboard candidate')
+      if (!personalResponse.ok) {
+        const errorData = await personalResponse.json()
+        throw new Error(errorData.message || 'Failed to save personal details')
+      }
+
+      // Step 2: Save Education Details
+      let educationResponse = await fetch('/api/signup/education-details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidateId: Number(candidateId),
+          education10th: finalData.education10th,
+          score10th: finalData.score10th,
+          education12th: finalData.education12th,
+          score12th: finalData.score12th,
+          graduationDegree: finalData.graduationDegree,
+          graduationField: finalData.graduationField,
+          graduationScore: finalData.graduationScore,
+        }),
+      })
+
+      if (!educationResponse.ok) {
+        const errorData = await educationResponse.json()
+        throw new Error(errorData.message || 'Failed to save education details')
+      }
+
+      // Step 3: Save Skills and Languages
+      let skillsResponse = await fetch('/api/signup/skills', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          candidateId: Number(candidateId),
+          skills: finalData.skills.map((skill: string) => ({
+            skillName: skill,
+            proficiencyLevel: 'INTERMEDIATE',
+          })),
+          languages: finalData.languagesKnown.map((language: string) => ({
+            languageName: language,
+            proficiencyLevel: 'INTERMEDIATE',
+          })),
+        }),
+      })
+
+      if (!skillsResponse.ok) {
+        const errorData = await skillsResponse.json()
+        throw new Error(errorData.message || 'Failed to save skills and languages')
+      }
+
+      // Step 4: Complete Signup
+      let completeResponse = await fetch(`/api/signup/complete?candidateId=${candidateId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!completeResponse.ok) {
+        const errorData = await completeResponse.json()
+        throw new Error(errorData.message || 'Failed to complete signup')
       }
 
       setSuccess(true)

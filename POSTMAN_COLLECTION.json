@@ -1,0 +1,193 @@
+{
+  "info": {
+    "_postman_id": "magic-bus-signup-api",
+    "name": "Magic Bus - Individual Signup API",
+    "description": "Complete API collection for individual signup flow",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Send OTP",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contact\": \"test@example.com\",\n  \"contactType\": \"EMAIL\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/signup/send-otp",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "send-otp"
+          ]
+        },
+        "description": "Send OTP to email or phone number"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Verify OTP",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"contact\": \"test@example.com\",\n  \"otpCode\": \"123456\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/signup/verify-otp",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "verify-otp"
+          ]
+        },
+        "description": "Verify OTP code"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Save Personal Details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"candidateId\": 1,\n  \"employmentStatus\": \"EMPLOYED\",\n  \"currentJobTitle\": \"Software Engineer\",\n  \"currentCompanyName\": \"Tech Corp\",\n  \"yearsOfExperience\": 3.5,\n  \"careerInterests\": \"[\\\"Web Development\\\",\\\"Cloud Computing\\\"]\",\n  \"preferredJobRoles\": \"[\\\"Senior Developer\\\",\\\"Tech Lead\\\"]\",\n  \"preferredLocations\": \"[\\\"Bangalore\\\",\\\"Hyderabad\\\"]\",\n  \"preferredJobTypes\": \"FULL_TIME\",\n  \"hasDisability\": false,\n  \"isFirstGenerationLearner\": false,\n  \"migrationStatus\": \"RESIDENT\",\n  \"availabilityToRelocate\": true,\n  \"availabilityForInternship\": false\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/signup/personal-details",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "personal-details"
+          ]
+        },
+        "description": "Save personal details"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Save Education Details",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"candidateId\": 1,\n  \"tenthBoard\": \"CBSE\",\n  \"tenthYearOfPassing\": 2015,\n  \"tenthPercentage\": 85.5,\n  \"tenthStream\": \"SCIENCE\",\n  \"tenthSchoolName\": \"ABC School\",\n  \"tenthSchoolLocation\": \"Bangalore\",\n  \"twelfthBoard\": \"CBSE\",\n  \"twelfthYearOfPassing\": 2017,\n  \"twelfthPercentage\": 88.75,\n  \"twelfthStream\": \"SCIENCE\",\n  \"twelfthCollegeName\": \"XYZ College\",\n  \"twelfthCollegeLocation\": \"Bangalore\",\n  \"graduationDegree\": \"B.Tech\",\n  \"graduationSpecialization\": \"Computer Science\",\n  \"graduationYear\": 2021,\n  \"graduationPercentage\": 82.3,\n  \"graduationUniversity\": \"Bangalore University\",\n  \"graduationStatus\": \"COMPLETED\",\n  \"certifications\": \"[\\\"AWS Certified\\\",\\\"Java Developer\\\"]\",\n  \"additionalQualifications\": \"[\\\"Data Science Course\\\"]\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/signup/education-details",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "education-details"
+          ]
+        },
+        "description": "Save education details"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Save Skills and Languages",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"candidateId\": 1,\n  \"skills\": [\n    {\n      \"skillName\": \"Java\",\n      \"proficiencyLevel\": \"EXPERT\",\n      \"yearsOfExperience\": 5.0\n    },\n    {\n      \"skillName\": \"Spring Boot\",\n      \"proficiencyLevel\": \"ADVANCED\",\n      \"yearsOfExperience\": 3.5\n    },\n    {\n      \"skillName\": \"PostgreSQL\",\n      \"proficiencyLevel\": \"INTERMEDIATE\",\n      \"yearsOfExperience\": 2.0\n    }\n  ],\n  \"languages\": [\n    {\n      \"languageName\": \"English\",\n      \"proficiencyLevel\": \"FLUENT\"\n    },\n    {\n      \"languageName\": \"Hindi\",\n      \"proficiencyLevel\": \"NATIVE\"\n    },\n    {\n      \"languageName\": \"Kannada\",\n      \"proficiencyLevel\": \"BASIC\"\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/signup/skills",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "skills"
+          ]
+        },
+        "description": "Save skills and languages"
+      },
+      "response": []
+    },
+    {
+      "name": "6. Complete Signup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/api/signup/complete?candidateId=1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "signup",
+            "complete"
+          ],
+          "query": [
+            {
+              "key": "candidateId",
+              "value": "1"
+            }
+          ]
+        },
+        "description": "Complete signup process"
+      },
+      "response": []
+    }
+  ]
+}

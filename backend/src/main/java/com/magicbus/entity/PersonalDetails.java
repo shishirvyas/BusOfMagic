@@ -96,9 +96,11 @@ public class PersonalDetails {
     @Column(name = "availability_for_internship")
     private Boolean availabilityForInternship = true;
     
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @Column(name = "updated_at")
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }

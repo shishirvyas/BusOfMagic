@@ -115,9 +115,11 @@ public class EducationDetails {
     @Column(name = "estimated_learning_capacity", length = 50)
     private String estimatedLearningCapacity;  // LOW, MEDIUM, HIGH
     
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", updatable = false)
+    @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @Column(name = "updated_at")
+    @Builder.Default
     private LocalDateTime updatedAt = LocalDateTime.now();
 }
