@@ -31,8 +31,8 @@ on:
       - main  # Trigger deployment on push to main branch
 
 jobs:
-   build-and-deploy-frontend:
-      runs-on: ubuntu-latest
+  build-and-deploy-frontend:
+    runs-on: ubuntu-latest
      
     steps:
     - name: Checkout code
@@ -47,13 +47,8 @@ jobs:
       run: |
         cd frontend
         npm install
-        # Install @types/node to resolve path module issues
         npm install @types/node --save-dev
-        
-    - name: Build Frontend 
-      run: |
-        cd frontend
-        npm run build  # Adjust for your frontend
+        npm run build
         
     - name: Deploy Frontend to Azure App Service
       uses: azure/webapps-deploy@v2
@@ -61,4 +56,5 @@ jobs:
         app-name: <frontend-app-service-name>  # Replace with your Azure App Service name
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Store this in GitHub secrets
+
 
