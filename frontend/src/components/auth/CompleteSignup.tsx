@@ -89,6 +89,15 @@ export default function CompleteSignup({
           }}
         >
           <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            {/* Logo */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <img 
+                src="/assets/magic-bus-logo.png" 
+                alt="Magic Bus Logo" 
+                style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              />
+            </Box>
+
             {/* Success Icon */}
             <Box sx={{ textAlign: 'center', mb: 3 }}>
               <CheckCircleIcon

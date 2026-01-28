@@ -73,6 +73,15 @@ export default function SignupForm({ onSubmit, isLoading = false }: SignupFormPr
           }}
         >
           <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+            {/* Logo */}
+            <Box sx={{ textAlign: 'center', mb: 4 }}>
+              <img 
+                src="/assets/magic-bus-logo.png" 
+                alt="Magic Bus Logo" 
+                style={{ height: '60px', width: 'auto', objectFit: 'contain' }}
+              />
+            </Box>
+
             {/* Header */}
             <Box sx={{ mb: 3, textAlign: 'center' }}>
               <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', mb: 1 }}>
