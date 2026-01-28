@@ -19,7 +19,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/api/candidates")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:5173"})
 public class CandidateController {
 
     private final OnboardingService onboardingService;

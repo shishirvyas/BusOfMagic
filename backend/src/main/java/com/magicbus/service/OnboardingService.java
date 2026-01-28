@@ -3,10 +3,13 @@ package com.magicbus.service;
 import com.magicbus.dto.OnboardingRequestDTO;
 import com.magicbus.dto.OnboardingResponseDTO;
 import com.magicbus.entity.*;
+import com.magicbus.entity.workflow.CandidateWorkflow;
+import com.magicbus.entity.workflow.WorkflowStatus;
 import com.magicbus.repository.CandidateRepository;
 import com.magicbus.repository.EducationDetailsRepository;
 import com.magicbus.repository.PersonalDetailsRepository;
 import com.magicbus.repository.SkillAssessmentRepository;
+import com.magicbus.repository.workflow.CandidateWorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +27,19 @@ public class OnboardingService {
     private final EducationDetailsRepository educationDetailsRepository;
     private final PersonalDetailsRepository personalDetailsRepository;
     private final SkillAssessmentRepository skillAssessmentRepository;
+    private final CandidateWorkflowRepository candidateWorkflowRepository;
 
     public OnboardingService(
             CandidateRepository candidateRepository,
             EducationDetailsRepository educationDetailsRepository,
             PersonalDetailsRepository personalDetailsRepository,
-            SkillAssessmentRepository skillAssessmentRepository) {
+            SkillAssessmentRepository skillAssessmentRepository,
+            CandidateWorkflowRepository candidateWorkflowRepository) {
         this.candidateRepository = candidateRepository;
         this.educationDetailsRepository = educationDetailsRepository;
         this.personalDetailsRepository = personalDetailsRepository;
         this.skillAssessmentRepository = skillAssessmentRepository;
+        this.candidateWorkflowRepository = candidateWorkflowRepository;
     }
 
     @Transactional
@@ -109,6 +115,14 @@ public class OnboardingService {
                 log.info("Skill assessments saved for candidate ID: {} ({} skills)", 
                         savedCandidate.getId(), request.getSkills().size());
             }
+
+            // Create workflow entry for the candidate (PENDING_SCREENING status)
+            CandidateWorkflow workflow = CandidateWorkflow.builder()
+                    .candidate(savedCandidate)
+                    .status(WorkflowStatus.PENDING_SCREENING)
+                    .build();
+            candidateWorkflowRepository.save(workflow);
+            log.info("Workflow created for candidate ID: {} with status PENDING_SCREENING", savedCandidate.getId());
 
             // Build response
             return OnboardingResponseDTO.builder()
