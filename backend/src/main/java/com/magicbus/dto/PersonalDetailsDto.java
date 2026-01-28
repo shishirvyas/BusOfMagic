@@ -9,12 +9,29 @@ import java.time.LocalDate;
 @Builder
 public class PersonalDetailsDto {
     private Long candidateId;
+    
+    // ========== Basic Candidate Information ==========
+    // These fields will be saved to the Candidate entity
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private LocalDate dateOfBirth;
+    private String gender;
+    private String address;  // Maps to addressLine1
+    private String city;
+    private String state;
+    private String pincode;
+    private String aadhar;   // Maps to aadharNumber
+    private String pan;      // Maps to panNumber
+    private String bankAccount;  // Maps to bankAccountNumber in PersonalDetails
+    
+    // ========== Employment & Career (PersonalDetails entity) ==========
     private String employmentStatus;
     private String currentJobTitle;
     private String currentCompanyName;
     private Double yearsOfExperience;
     private String previousEmployers;  // JSON array
-    private String bankAccountNumber;
     private String ifscCode;
     private String bankName;
     private String accountHolderName;

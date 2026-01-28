@@ -194,6 +194,9 @@ public class SignupService {
     
     /**
      * Step 3: Save Personal Details
+     * This method saves both:
+     * - Basic candidate info (name, contact, address, ID docs) to Candidate entity
+     * - Employment/preference info to PersonalDetails entity
      */
     public void savePersonalDetails(PersonalDetailsDto dto) {
         log.info("Saving personal details for candidate: {}", dto.getCandidateId());
@@ -201,10 +204,66 @@ public class SignupService {
         Candidate candidate = candidateRepository.findById(dto.getCandidateId())
             .orElseThrow(() -> new RuntimeException("Candidate not found"));
         
+        // ========== Update Candidate entity with basic information ==========
+        if (dto.getFirstName() != null && !dto.getFirstName().isEmpty()) {
+            candidate.setFirstName(dto.getFirstName());
+        }
+        if (dto.getLastName() != null && !dto.getLastName().isEmpty()) {
+            candidate.setLastName(dto.getLastName());
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+            candidate.setEmail(dto.getEmail());
+        }
+        if (dto.getPhone() != null && !dto.getPhone().isEmpty()) {
+            candidate.setPhoneNumber(dto.getPhone());
+        }
+        if (dto.getDateOfBirth() != null) {
+            candidate.setDateOfBirth(dto.getDateOfBirth());
+        }
+        if (dto.getGender() != null && !dto.getGender().isEmpty()) {
+            candidate.setGender(dto.getGender());
+        }
+        if (dto.getAddress() != null && !dto.getAddress().isEmpty()) {
+            candidate.setAddressLine1(dto.getAddress());
+        }
+        if (dto.getCity() != null && !dto.getCity().isEmpty()) {
+            candidate.setCity(dto.getCity());
+        }
+        if (dto.getState() != null && !dto.getState().isEmpty()) {
+            candidate.setState(dto.getState());
+        }
+        if (dto.getPincode() != null && !dto.getPincode().isEmpty()) {
+            candidate.setPincode(dto.getPincode());
+        }
+        if (dto.getAadhar() != null && !dto.getAadhar().isEmpty()) {
+            candidate.setAadharNumber(dto.getAadhar());
+        }
+        if (dto.getPan() != null && !dto.getPan().isEmpty()) {
+            candidate.setPanNumber(dto.getPan());
+        }
+        candidate.setUpdatedAt(LocalDateTime.now());
+        candidateRepository.save(candidate);
+        log.info("Updated Candidate entity with basic info");
+        
+        // ========== Update PersonalDetails entity with additional info ==========
         PersonalDetails personalDetails = personalDetailsRepository.findByCandidateId(dto.getCandidateId())
             .orElseGet(() -> PersonalDetails.builder().candidate(candidate).build());
         
-        // Update personal details
+        // Bank account info
+        if (dto.getBankAccount() != null && !dto.getBankAccount().isEmpty()) {
+            personalDetails.setBankAccountNumber(dto.getBankAccount());
+        }
+        if (dto.getIfscCode() != null) {
+            personalDetails.setIfscCode(dto.getIfscCode());
+        }
+        if (dto.getBankName() != null) {
+            personalDetails.setBankName(dto.getBankName());
+        }
+        if (dto.getAccountHolderName() != null) {
+            personalDetails.setAccountHolderName(dto.getAccountHolderName());
+        }
+        
+        // Employment & Career info
         personalDetails.setEmploymentStatus(dto.getEmploymentStatus());
         personalDetails.setCurrentJobTitle(dto.getCurrentJobTitle());
         personalDetails.setCurrentCompanyName(dto.getCurrentCompanyName());
@@ -230,6 +289,7 @@ public class SignupService {
     
     /**
      * Step 4: Save Education Details
+     * Handles both simplified frontend field names and detailed field names
      */
     public void saveEducationDetails(EducationDetailsDto dto) {
         log.info("Saving education details for candidate: {}", dto.getCandidateId());
@@ -240,27 +300,95 @@ public class SignupService {
         EducationDetails educationDetails = educationDetailsRepository.findByCandidateId(dto.getCandidateId())
             .orElseGet(() -> EducationDetails.builder().candidate(candidate).build());
         
-        // Update education details
-        educationDetails.setTenthBoard(dto.getTenthBoard());
-        educationDetails.setTenthYearOfPassing(dto.getTenthYearOfPassing());
-        educationDetails.setTenthPercentage(dto.getTenthPercentage());
-        educationDetails.setTenthStream(dto.getTenthStream());
-        educationDetails.setTenthSchoolName(dto.getTenthSchoolName());
+        // ========== 10th Standard ==========
+        // Accept either frontend simplified names OR detailed field names
+        String tenthBoard = dto.getEducation10th() != null ? dto.getEducation10th() : dto.getTenthBoard();
+        if (tenthBoard != null && !tenthBoard.isEmpty()) {
+            educationDetails.setTenthBoard(tenthBoard);
+        }
         
-        educationDetails.setTwelfthBoard(dto.getTwelfthBoard());
-        educationDetails.setTwelfthYearOfPassing(dto.getTwelfthYearOfPassing());
-        educationDetails.setTwelfthPercentage(dto.getTwelfthPercentage());
-        educationDetails.setTwelfthStream(dto.getTwelfthStream());
-        educationDetails.setTwelfthCollegeName(dto.getTwelfthCollegeName());
+        // Parse score10th to BigDecimal if provided
+        if (dto.getScore10th() != null && !dto.getScore10th().isEmpty()) {
+            try {
+                String scoreStr = dto.getScore10th().replace("%", "").trim();
+                educationDetails.setTenthPercentage(new java.math.BigDecimal(scoreStr));
+            } catch (NumberFormatException e) {
+                log.warn("Could not parse 10th score: {}", dto.getScore10th());
+            }
+        } else if (dto.getTenthPercentage() != null) {
+            educationDetails.setTenthPercentage(dto.getTenthPercentage());
+        }
         
-        educationDetails.setGraduationDegree(dto.getGraduationDegree());
-        educationDetails.setGraduationSpecialization(dto.getGraduationSpecialization());
-        educationDetails.setGraduationYear(dto.getGraduationYear());
-        educationDetails.setGraduationPercentage(dto.getGraduationPercentage());
-        educationDetails.setGraduationUniversity(dto.getGraduationUniversity());
+        if (dto.getTenthYearOfPassing() != null) {
+            educationDetails.setTenthYearOfPassing(dto.getTenthYearOfPassing());
+        }
+        if (dto.getTenthStream() != null) {
+            educationDetails.setTenthStream(dto.getTenthStream());
+        }
+        if (dto.getTenthSchoolName() != null) {
+            educationDetails.setTenthSchoolName(dto.getTenthSchoolName());
+        }
         
-        educationDetails.setCertifications(dto.getCertifications());
-        // additionalQualifications is stored in certifications field
+        // ========== 12th Standard ==========
+        String twelfthBoard = dto.getEducation12th() != null ? dto.getEducation12th() : dto.getTwelfthBoard();
+        if (twelfthBoard != null && !twelfthBoard.isEmpty()) {
+            educationDetails.setTwelfthBoard(twelfthBoard);
+        }
+        
+        // Parse score12th to BigDecimal if provided
+        if (dto.getScore12th() != null && !dto.getScore12th().isEmpty()) {
+            try {
+                String scoreStr = dto.getScore12th().replace("%", "").trim();
+                educationDetails.setTwelfthPercentage(new java.math.BigDecimal(scoreStr));
+            } catch (NumberFormatException e) {
+                log.warn("Could not parse 12th score: {}", dto.getScore12th());
+            }
+        } else if (dto.getTwelfthPercentage() != null) {
+            educationDetails.setTwelfthPercentage(dto.getTwelfthPercentage());
+        }
+        
+        if (dto.getTwelfthYearOfPassing() != null) {
+            educationDetails.setTwelfthYearOfPassing(dto.getTwelfthYearOfPassing());
+        }
+        if (dto.getTwelfthStream() != null) {
+            educationDetails.setTwelfthStream(dto.getTwelfthStream());
+        }
+        if (dto.getTwelfthCollegeName() != null) {
+            educationDetails.setTwelfthCollegeName(dto.getTwelfthCollegeName());
+        }
+        
+        // ========== Graduation ==========
+        if (dto.getGraduationDegree() != null && !dto.getGraduationDegree().isEmpty()) {
+            educationDetails.setGraduationDegree(dto.getGraduationDegree());
+        }
+        
+        String gradSpec = dto.getGraduationField() != null ? dto.getGraduationField() : dto.getGraduationSpecialization();
+        if (gradSpec != null && !gradSpec.isEmpty()) {
+            educationDetails.setGraduationSpecialization(gradSpec);
+        }
+        
+        // Parse graduationScore to BigDecimal if provided
+        if (dto.getGraduationScore() != null && !dto.getGraduationScore().isEmpty()) {
+            try {
+                String scoreStr = dto.getGraduationScore().replace("%", "").trim();
+                educationDetails.setGraduationPercentage(new java.math.BigDecimal(scoreStr));
+            } catch (NumberFormatException e) {
+                log.warn("Could not parse graduation score: {}", dto.getGraduationScore());
+            }
+        } else if (dto.getGraduationPercentage() != null) {
+            educationDetails.setGraduationPercentage(dto.getGraduationPercentage());
+        }
+        
+        if (dto.getGraduationYear() != null) {
+            educationDetails.setGraduationYear(dto.getGraduationYear());
+        }
+        if (dto.getGraduationUniversity() != null) {
+            educationDetails.setGraduationUniversity(dto.getGraduationUniversity());
+        }
+        
+        if (dto.getCertifications() != null) {
+            educationDetails.setCertifications(dto.getCertifications());
+        }
         educationDetails.setUpdatedAt(LocalDateTime.now());
         
         educationDetailsRepository.save(educationDetails);

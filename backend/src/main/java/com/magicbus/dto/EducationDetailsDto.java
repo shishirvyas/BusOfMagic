@@ -10,6 +10,17 @@ import java.math.BigDecimal;
 public class EducationDetailsDto {
     private Long candidateId;
     
+    // ========== Frontend field names (simplified) ==========
+    // These are the names used by the frontend form
+    private String education10th;   // Maps to tenthBoard
+    private String score10th;       // Maps to tenthPercentage (parsed to BigDecimal)
+    private String education12th;   // Maps to twelfthBoard
+    private String score12th;       // Maps to twelfthPercentage (parsed to BigDecimal)
+    private String graduationDegree;
+    private String graduationField; // Maps to graduationSpecialization
+    private String graduationScore; // Maps to graduationPercentage (parsed to BigDecimal)
+    
+    // ========== Original detailed field names ==========
     // 10th Standard
     private String tenthBoard;
     private Integer tenthYearOfPassing;
@@ -26,8 +37,7 @@ public class EducationDetailsDto {
     private String twelfthCollegeName;
     private String twelfthCollegeLocation;
     
-    // Graduation
-    private String graduationDegree;
+    // Graduation - detailed fields
     private String graduationSpecialization;
     private Integer graduationYear;
     private BigDecimal graduationPercentage;
