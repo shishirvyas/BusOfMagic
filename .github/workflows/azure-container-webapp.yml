@@ -49,7 +49,7 @@ jobs:
         npm install
         npm install @types/node --save-dev
         npm fund
-        npm audit fix
+        npm audit fix --force
         npm run build
         
     - name: Deploy Frontend to Azure App Service
