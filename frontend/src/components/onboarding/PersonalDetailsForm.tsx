@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box,
   TextField,
@@ -10,7 +10,25 @@ import {
   MenuItem,
   Alert,
   Typography,
+  CircularProgress,
+  FormHelperText,
 } from '@mui/material'
+import apiClient from '@services/api'
+
+interface StateDTO {
+  id: number
+  stateCode: string
+  stateName: string
+  isActive: boolean
+}
+
+interface CityDTO {
+  id: number
+  cityName: string
+  stateId: number
+  stateName: string
+  isActive: boolean
+}
 
 interface PersonalDetailsFormProps {
   data: any
@@ -36,6 +54,11 @@ export default function PersonalDetailsForm({
   onNext,
   isLoading,
 }: PersonalDetailsFormProps) {
+  const [states, setStates] = useState<StateDTO[]>([])
+  const [cities, setCities] = useState<CityDTO[]>([])
+  const [loadingStates, setLoadingStates] = useState(true)
+  const [loadingCities, setLoadingCities] = useState(false)
+  
   const [formData, setFormData] = useState({
     firstName: data.firstName || '',
     lastName: data.lastName || '',
@@ -46,6 +69,8 @@ export default function PersonalDetailsForm({
     address: data.address || '',
     city: data.city || '',
     state: data.state || '',
+    stateId: data.stateId || '',
+    cityId: data.cityId || '',
     pincode: data.pincode || '',
     aadhar: data.aadhar || '',
     pan: data.pan || '',
@@ -53,6 +78,43 @@ export default function PersonalDetailsForm({
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Fetch states on component mount
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        setLoadingStates(true)
+        const response = await apiClient.get('/locations/states/active')
+        setStates(response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch states:', error)
+      } finally {
+        setLoadingStates(false)
+      }
+    }
+    fetchStates()
+  }, [])
+
+  // Fetch cities when state changes
+  useEffect(() => {
+    const fetchCities = async () => {
+      if (!formData.stateId) {
+        setCities([])
+        return
+      }
+      try {
+        setLoadingCities(true)
+        const response = await apiClient.get(`/locations/cities/state/${formData.stateId}/active`)
+        setCities(response.data || [])
+      } catch (error) {
+        console.error('Failed to fetch cities:', error)
+        setCities([])
+      } finally {
+        setLoadingCities(false)
+      }
+    }
+    fetchCities()
+  }, [formData.stateId])
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -78,6 +140,40 @@ export default function PersonalDetailsForm({
       setErrors((prev) => {
         const updated = { ...prev }
         delete updated[field]
+        return updated
+      })
+    }
+  }
+
+  const handleStateChange = (stateId: string) => {
+    const selectedState = states.find(s => s.id.toString() === stateId)
+    setFormData((prev) => ({
+      ...prev,
+      stateId: stateId,
+      state: selectedState?.stateName || '',
+      cityId: '', // Reset city when state changes
+      city: '',
+    }))
+    if (errors.state) {
+      setErrors((prev) => {
+        const updated = { ...prev }
+        delete updated.state
+        return updated
+      })
+    }
+  }
+
+  const handleCityChange = (cityId: string) => {
+    const selectedCity = cities.find(c => c.id.toString() === cityId)
+    setFormData((prev) => ({
+      ...prev,
+      cityId: cityId,
+      city: selectedCity?.cityName || '',
+    }))
+    if (errors.city) {
+      setErrors((prev) => {
+        const updated = { ...prev }
+        delete updated.city
         return updated
       })
     }
@@ -219,27 +315,59 @@ export default function PersonalDetailsForm({
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={renderLabel('city', 'City')}
-            value={formData.city}
-            onChange={(e) => handleChange('city', e.target.value)}
-            error={!!errors.city}
-            helperText={errors.city}
-            placeholder="Mumbai"
-          />
+          <FormControl fullWidth error={!!errors.state}>
+            <InputLabel>{renderLabel('state', 'State')}</InputLabel>
+            <Select
+              value={formData.stateId}
+              label={renderLabel('state', 'State')}
+              onChange={(e) => handleStateChange(e.target.value as string)}
+              disabled={loadingStates}
+            >
+              {loadingStates ? (
+                <MenuItem value="" disabled>
+                  <CircularProgress size={20} sx={{ mr: 1 }} /> Loading states...
+                </MenuItem>
+              ) : states.length === 0 ? (
+                <MenuItem value="" disabled>No states available</MenuItem>
+              ) : (
+                states.map((state) => (
+                  <MenuItem key={state.id} value={state.id.toString()}>
+                    {state.stateName}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+            {errors.state && <FormHelperText>{errors.state}</FormHelperText>}
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label={renderLabel('state', 'State')}
-            value={formData.state}
-            onChange={(e) => handleChange('state', e.target.value)}
-            error={!!errors.state}
-            helperText={errors.state}
-            placeholder="Maharashtra"
-          />
+          <FormControl fullWidth error={!!errors.city}>
+            <InputLabel>{renderLabel('city', 'City')}</InputLabel>
+            <Select
+              value={formData.cityId}
+              label={renderLabel('city', 'City')}
+              onChange={(e) => handleCityChange(e.target.value as string)}
+              disabled={!formData.stateId || loadingCities}
+            >
+              {!formData.stateId ? (
+                <MenuItem value="" disabled>Select a state first</MenuItem>
+              ) : loadingCities ? (
+                <MenuItem value="" disabled>
+                  <CircularProgress size={20} sx={{ mr: 1 }} /> Loading cities...
+                </MenuItem>
+              ) : cities.length === 0 ? (
+                <MenuItem value="" disabled>No cities available</MenuItem>
+              ) : (
+                cities.map((city) => (
+                  <MenuItem key={city.id} value={city.id.toString()}>
+                    {city.cityName}
+                  </MenuItem>
+                ))
+              )}
+            </Select>
+            {errors.city && <FormHelperText>{errors.city}</FormHelperText>}
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={6}>
