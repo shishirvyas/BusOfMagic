@@ -50,4 +50,32 @@ public interface TrainingBatchRepository extends JpaRepository<TrainingBatch, Lo
 
     @Query("SELECT tb FROM TrainingBatch tb WHERE tb.training.id = :trainingId AND tb.isActive = true")
     List<TrainingBatch> findActiveByTrainingId(@Param("trainingId") Long trainingId);
+
+    // Training Calendar queries
+    @Query("SELECT DISTINCT tb FROM TrainingBatch tb " +
+           "JOIN FETCH tb.training t " +
+           "LEFT JOIN FETCH tb.enrolledCandidates ec " +
+           "LEFT JOIN FETCH ec.candidate c " +
+           "LEFT JOIN FETCH ec.enrolledBy eb " +
+           "ORDER BY tb.startDate ASC")
+    List<TrainingBatch> findAllWithEnrolledCandidates();
+
+    @Query("SELECT DISTINCT tb FROM TrainingBatch tb " +
+           "JOIN FETCH tb.training t " +
+           "LEFT JOIN FETCH tb.enrolledCandidates ec " +
+           "LEFT JOIN FETCH ec.candidate c " +
+           "LEFT JOIN FETCH ec.enrolledBy eb " +
+           "WHERE tb.id = :id")
+    Optional<TrainingBatch> findByIdWithEnrolledCandidates(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT tb FROM TrainingBatch tb " +
+           "JOIN FETCH tb.training t " +
+           "LEFT JOIN FETCH tb.enrolledCandidates ec " +
+           "LEFT JOIN FETCH ec.candidate c " +
+           "WHERE (tb.startDate BETWEEN :startDate AND :endDate) " +
+           "OR (tb.endDate BETWEEN :startDate AND :endDate) " +
+           "OR (tb.startDate <= :startDate AND tb.endDate >= :endDate) " +
+           "ORDER BY tb.startDate ASC")
+    List<TrainingBatch> findBatchesInDateRange(@Param("startDate") LocalDate startDate, 
+                                                @Param("endDate") LocalDate endDate);
 }

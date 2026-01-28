@@ -19,6 +19,7 @@ import Onboarding from '@pages/Onboarding'
 import { AdminManagement, RoleManagement, PermissionManagement } from '@pages/admin'
 import { UnderScreening, Orientation, Enroll } from '@pages/screening'
 import { TrainingMaster, TrainingBatches } from '@pages/training'
+import TrainingCalendar from '@pages/training/TrainingCalendar'
 
 const theme = createTheme({
   palette: {
@@ -130,6 +131,14 @@ function App() {
                     element={
                       <ProtectedRoute requiredPermission="TRAINING_MANAGE">
                         <TrainingBatches />
+                      </ProtectedRoute>
+                    } 
+                  />
+                  <Route 
+                    path="training-calendar" 
+                    element={
+                      <ProtectedRoute requiredPermission="TRAINING_VIEW">
+                        <TrainingCalendar />
                       </ProtectedRoute>
                     } 
                   />

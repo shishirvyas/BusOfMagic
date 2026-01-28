@@ -253,9 +253,7 @@ public class AuthDataInitializer implements CommandLineRunner {
                 permissions.get("CUSTOMER_VIEW"), menuGroups.get("operations")),
             createMenuItem("locations", "Locations", "LocationCity", "/locations", 2, 
                 permissions.get("LOCATION_VIEW"), menuGroups.get("operations")),
-            createMenuItem("onboarding", "Onboarding", "Assignment", "/onboarding", 3, 
-                permissions.get("ONBOARDING_VIEW"), menuGroups.get("operations")),
-            createMenuItem("reports", "Reports", "Assessment", "/reports", 4, 
+            createMenuItem("reports", "Reports", "Assessment", "/reports", 3, 
                 permissions.get("REPORT_VIEW"), menuGroups.get("operations")),
             
             // System Group
@@ -263,7 +261,9 @@ public class AuthDataInitializer implements CommandLineRunner {
                 permissions.get("TRAINING_MANAGE"), menuGroups.get("system")),
             createMenuItem("training-batches", "Training Batches", "EventNote", "/training-batches", 2, 
                 permissions.get("TRAINING_MANAGE"), menuGroups.get("system")),
-            createMenuItem("settings", "Settings", "Settings", "/settings", 3, 
+            createMenuItem("training-calendar", "Training Calendar", "CalendarMonth", "/training-calendar", 3, 
+                permissions.get("TRAINING_MANAGE"), menuGroups.get("system")),
+            createMenuItem("settings", "Settings", "Settings", "/settings", 4, 
                 permissions.get("SETTINGS_VIEW"), menuGroups.get("system"))
         );
         
