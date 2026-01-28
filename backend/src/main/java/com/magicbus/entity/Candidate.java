@@ -36,10 +36,10 @@ public class Candidate {
     @Column(length = 100, nullable = false)
     private String lastName;
     
-    @Column(length = 255, unique = true)
+    @Column(length = 255)
     private String email;
     
-    @Column(length = 20, nullable = false, unique = true)
+    @Column(length = 20, nullable = false)
     private String phoneNumber;
     
     @Column(length = 20)

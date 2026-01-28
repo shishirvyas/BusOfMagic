@@ -3,6 +3,7 @@ import SignupForm from '@components/auth/IndividualSignupForm'
 import OTPVerification from '@components/auth/OTPVerification'
 import CompleteSignup from '@components/auth/CompleteSignup'
 import { useError } from '@context/ErrorContext'
+import { useAuth } from '@context/AuthContext'
 import { apiCall, ApiErrorResponse } from '@services/api'
 
 type SignupStep = 'contact' | 'otp' | 'profile'
@@ -17,6 +18,7 @@ interface SignupData {
 
 export default function IndividualSignup() {
   const { addError } = useError()
+  const { setCandidateData } = useAuth()
   const [currentStep, setCurrentStep] = useState<SignupStep>('contact')
   const [signupData, setSignupData] = useState<SignupData>({
     contact: '',
@@ -91,8 +93,11 @@ export default function IndividualSignup() {
           ...signupData,
           candidateId,
         })
-        // Store candidateId in localStorage immediately after OTP verification
+        // Store candidateId in localStorage and context
         localStorage.setItem('candidateId', String(candidateId))
+        setCandidateData({
+          candidateId: String(candidateId),
+        })
       }
 
       console.log('OTP verified, moving to profile step')

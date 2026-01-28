@@ -12,6 +12,7 @@ import {
 } from '@mui/material'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { useAuth } from '@context/AuthContext'
 
 interface CompleteSignupProps {
   contact: string
@@ -26,6 +27,7 @@ export default function CompleteSignup({
   onSubmit,
   isLoading = false,
 }: CompleteSignupProps) {
+  const { setCandidateData } = useAuth()
   const [fullName, setFullName] = useState('')
   const [dateOfBirth, setDateOfBirth] = useState('')
   const [error, setError] = useState('')
@@ -48,6 +50,18 @@ export default function CompleteSignup({
       setError('Please select your date of birth')
       return
     }
+
+    // Parse first and last name from full name
+    const parts = fullName.trim().split(' ')
+    const firstName = parts[0]
+    const lastName = parts.slice(1).join(' ')
+
+    // Store in context
+    setCandidateData({
+      firstName,
+      lastName,
+      dateOfBirth,
+    })
 
     onSubmit({
       fullName: fullName.trim(),

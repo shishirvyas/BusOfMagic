@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import { ErrorProvider } from '@context/ErrorContext'
+import { AuthProvider } from '@context/AuthContext'
 import ErrorNotification from '@components/common/ErrorNotification'
 import Layout from '@components/layout/Layout'
 import Dashboard from '@pages/Dashboard'
@@ -27,14 +28,15 @@ const theme = createTheme({
 function App() {
   return (
     <ErrorProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <ErrorNotification />
-        <BrowserRouter>
-          <Routes>
-          {/* Auth Routes (without layout) */}
-          <Route path="individualsignup" element={<IndividualSignup />} />
-          <Route path="onboard" element={<Onboarding />} />
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ErrorNotification />
+          <BrowserRouter>
+            <Routes>
+            {/* Auth Routes (without layout) */}
+            <Route path="individualsignup" element={<IndividualSignup />} />
+            <Route path="onboard" element={<Onboarding />} />
 
           {/* Dashboard Routes (with layout) */}
           <Route element={<Layout />}>
@@ -45,7 +47,8 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-    </ThemeProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ErrorProvider>
   )
 }

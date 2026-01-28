@@ -30,6 +30,11 @@ public class CandidateLanguage {
     @Column(length = 50)
     private String proficiencyLevel;  // BASIC, INTERMEDIATE, FLUENT, NATIVE
     
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = true, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

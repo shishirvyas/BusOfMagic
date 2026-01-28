@@ -35,12 +35,23 @@ public class CandidateSkill {
     @Column(precision = 3, scale = 1)
     private BigDecimal yearsOfExperience;
     
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean verified = false;
     
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(nullable = true, updatable = false)
+    private LocalDateTime createdAt;
     
-    @Column(nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(nullable = true)
+    private LocalDateTime updatedAt;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

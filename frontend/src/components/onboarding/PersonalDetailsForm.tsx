@@ -9,6 +9,7 @@ import {
   Select,
   MenuItem,
   Alert,
+  Typography,
 } from '@mui/material'
 
 interface PersonalDetailsFormProps {
@@ -16,6 +17,19 @@ interface PersonalDetailsFormProps {
   onNext: (data: any) => void
   isLoading: boolean
 }
+
+const MANDATORY_FIELDS = [
+  'firstName',
+  'lastName',
+  'email',
+  'phone',
+  'dateOfBirth',
+  'gender',
+  'address',
+  'city',
+  'state',
+  'pincode',
+]
 
 export default function PersonalDetailsForm({
   data,
@@ -75,6 +89,11 @@ export default function PersonalDetailsForm({
     }
   }
 
+  const renderLabel = (fieldName: string, label: string) => {
+    const isMandatory = MANDATORY_FIELDS.includes(fieldName)
+    return isMandatory ? `${label} *` : label
+  }
+
   return (
     <Box>
       {Object.keys(errors).length > 0 && (
@@ -83,28 +102,40 @@ export default function PersonalDetailsForm({
         </Alert>
       )}
 
+      <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mb: 2 }}>
+        * indicates mandatory field
+      </Typography>
+
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="First Name"
+            label={renderLabel('firstName', 'First Name')}
             value={formData.firstName}
             onChange={(e) => handleChange('firstName', e.target.value)}
             error={!!errors.firstName}
             helperText={errors.firstName}
             placeholder="John"
+            disabled={data.isFirstNameReadOnly}
+            InputProps={{
+              readOnly: data.isFirstNameReadOnly,
+            }}
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Last Name"
+            label={renderLabel('lastName', 'Last Name')}
             value={formData.lastName}
             onChange={(e) => handleChange('lastName', e.target.value)}
             error={!!errors.lastName}
             helperText={errors.lastName}
             placeholder="Doe"
+            disabled={data.isLastNameReadOnly}
+            InputProps={{
+              readOnly: data.isLastNameReadOnly,
+            }}
           />
         </Grid>
 
@@ -112,24 +143,32 @@ export default function PersonalDetailsForm({
           <TextField
             fullWidth
             type="email"
-            label="Email"
+            label={renderLabel('email', 'Email')}
             value={formData.email}
             onChange={(e) => handleChange('email', e.target.value)}
             error={!!errors.email}
-            helperText={errors.email}
+            helperText={errors.email || (data.isEmailReadOnly ? 'Read-only from signup' : '')}
             placeholder="john@example.com"
+            disabled={data.isEmailReadOnly}
+            InputProps={{
+              readOnly: data.isEmailReadOnly,
+            }}
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Phone"
+            label={renderLabel('phone', 'Phone')}
             value={formData.phone}
             onChange={(e) => handleChange('phone', e.target.value)}
             error={!!errors.phone}
-            helperText={errors.phone}
+            helperText={errors.phone || (data.isPhoneReadOnly ? 'Read-only from signup' : '')}
             placeholder="9876543210"
+            disabled={data.isPhoneReadOnly}
+            InputProps={{
+              readOnly: data.isPhoneReadOnly,
+            }}
           />
         </Grid>
 
@@ -137,26 +176,30 @@ export default function PersonalDetailsForm({
           <TextField
             fullWidth
             type="date"
-            label="Date of Birth"
+            label={renderLabel('dateOfBirth', 'Date of Birth')}
             value={formData.dateOfBirth}
             onChange={(e) => handleChange('dateOfBirth', e.target.value)}
             error={!!errors.dateOfBirth}
-            helperText={errors.dateOfBirth}
+            helperText={errors.dateOfBirth || (data.isDateOfBirthReadOnly ? 'Read-only from profile' : '')}
             InputLabelProps={{ shrink: true }}
+            disabled={data.isDateOfBirthReadOnly}
+            inputProps={{
+              readOnly: data.isDateOfBirthReadOnly,
+            }}
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <FormControl fullWidth error={!!errors.gender}>
-            <InputLabel>Gender</InputLabel>
+            <InputLabel>{renderLabel('gender', 'Gender')}</InputLabel>
             <Select
               value={formData.gender}
-              label="Gender"
+              label={renderLabel('gender', 'Gender')}
               onChange={(e) => handleChange('gender', e.target.value)}
             >
-              <MenuItem value="male">Male</MenuItem>
-              <MenuItem value="female">Female</MenuItem>
-              <MenuItem value="other">Other</MenuItem>
+              <MenuItem value="MALE">Male</MenuItem>
+              <MenuItem value="FEMALE">Female</MenuItem>
+              <MenuItem value="OTHER">Other</MenuItem>
             </Select>
           </FormControl>
         </Grid>
@@ -164,7 +207,7 @@ export default function PersonalDetailsForm({
         <Grid item xs={12}>
           <TextField
             fullWidth
-            label="Address"
+            label={renderLabel('address', 'Address')}
             value={formData.address}
             onChange={(e) => handleChange('address', e.target.value)}
             error={!!errors.address}
@@ -178,7 +221,7 @@ export default function PersonalDetailsForm({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="City"
+            label={renderLabel('city', 'City')}
             value={formData.city}
             onChange={(e) => handleChange('city', e.target.value)}
             error={!!errors.city}
@@ -190,7 +233,7 @@ export default function PersonalDetailsForm({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="State"
+            label={renderLabel('state', 'State')}
             value={formData.state}
             onChange={(e) => handleChange('state', e.target.value)}
             error={!!errors.state}
@@ -202,7 +245,7 @@ export default function PersonalDetailsForm({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Pincode"
+            label={renderLabel('pincode', 'Pincode')}
             value={formData.pincode}
             onChange={(e) => handleChange('pincode', e.target.value)}
             error={!!errors.pincode}
@@ -214,20 +257,20 @@ export default function PersonalDetailsForm({
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="Aadhar Number (Optional)"
-            value={formData.aadhar}
-            onChange={(e) => handleChange('aadhar', e.target.value)}
-            placeholder="1234 5678 9012"
+            label="PAN Number (Optional)"
+            value={formData.pan}
+            onChange={(e) => handleChange('pan', e.target.value)}
+            placeholder="ABCDE1234F"
           />
         </Grid>
 
         <Grid item xs={12} sm={6}>
           <TextField
             fullWidth
-            label="PAN Number (Optional)"
-            value={formData.pan}
-            onChange={(e) => handleChange('pan', e.target.value)}
-            placeholder="ABCDE1234F"
+            label="Aadhar Number (Optional)"
+            value={formData.aadhar}
+            onChange={(e) => handleChange('aadhar', e.target.value)}
+            placeholder="1234 5678 9012"
           />
         </Grid>
 

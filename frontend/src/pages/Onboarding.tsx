@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Box,
   Stepper,
@@ -15,6 +15,7 @@ import PersonalDetailsForm from '@components/onboarding/PersonalDetailsForm'
 import EducationDetailsForm from '@components/onboarding/EducationDetailsForm'
 import SkillsForm from '@components/onboarding/SkillsForm'
 import ReviewForm from '@components/onboarding/ReviewForm'
+import { useAuth } from '@context/AuthContext'
 
 type OnboardingStep = 'personal' | 'education' | 'skills' | 'review'
 
@@ -49,21 +50,30 @@ interface OnboardingData {
   skills: string[]
   languagesKnown: string[]
   certifications: string[]
+  
+  // Read-only flags
+  isFirstNameReadOnly: boolean
+  isLastNameReadOnly: boolean
+  isDateOfBirthReadOnly: boolean
+  isPhoneReadOnly: boolean
+  isEmailReadOnly: boolean
 }
 
 const STEPS: OnboardingStep[] = ['personal', 'education', 'skills', 'review']
 
 export default function Onboarding() {
+  const { candidateId, registrationMethod, registrationContact, firstName: ctxFirstName, lastName: ctxLastName, dateOfBirth: ctxDateOfBirth, setCandidateData } = useAuth()
   const [activeStep, setActiveStep] = useState(0)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [fetchError, setFetchError] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [formData, setFormData] = useState<OnboardingData>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    dateOfBirth: '',
+    firstName: ctxFirstName || '',
+    lastName: ctxLastName || '',
+    email: registrationMethod === 'email' ? registrationContact || '' : '',
+    phone: registrationMethod === 'phone' ? registrationContact || '' : '',
+    dateOfBirth: ctxDateOfBirth || '',
     gender: '',
     address: '',
     city: '',
@@ -82,7 +92,64 @@ export default function Onboarding() {
     skills: [],
     languagesKnown: [],
     certifications: [],
+    isFirstNameReadOnly: !!ctxFirstName,
+    isLastNameReadOnly: !!ctxLastName,
+    isDateOfBirthReadOnly: !!ctxDateOfBirth,
+    isPhoneReadOnly: registrationMethod === 'phone',
+    isEmailReadOnly: registrationMethod === 'email',
   })
+
+  // Fetch candidate data on mount
+  useEffect(() => {
+    const fetchCandidateData = async () => {
+      try {
+        setIsLoading(true)
+        const id = candidateId || localStorage.getItem('candidateId')
+        
+        if (!id) {
+          setFetchError('Candidate ID not found. Please start from signup.')
+          return
+        }
+
+        const response = await fetch(`/api/candidates/${id}`)
+        if (response.ok) {
+          const data = await response.json()
+          const firstName = data.firstName || ctxFirstName || ''
+          const lastName = data.lastName || ctxLastName || ''
+          const dateOfBirth = data.dateOfBirth || ctxDateOfBirth || ''
+          
+          // Store fetched data in context
+          setCandidateData({
+            candidateId: id,
+            firstName,
+            lastName,
+            dateOfBirth,
+          })
+
+          setFormData((prev) => ({
+            ...prev,
+            firstName,
+            lastName,
+            dateOfBirth,
+            email: registrationMethod === 'email' ? registrationContact || data.email || '' : data.email || '',
+            phone: registrationMethod === 'phone' ? registrationContact || data.phoneNumber || '' : data.phoneNumber || '',
+            isFirstNameReadOnly: true,
+            isLastNameReadOnly: true,
+            isDateOfBirthReadOnly: true,
+            isPhoneReadOnly: registrationMethod === 'phone',
+            isEmailReadOnly: registrationMethod === 'email',
+          }))
+        }
+      } catch (err) {
+        console.error('Error fetching candidate data:', err)
+        // Don't treat as error - user can still continue with signup
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchCandidateData()
+  }, [candidateId, registrationMethod, registrationContact, ctxFirstName, ctxLastName, ctxDateOfBirth, setCandidateData])
 
   const handleNext = async (stepData: Partial<OnboardingData>) => {
     setError('')
@@ -213,6 +280,24 @@ export default function Onboarding() {
     }
   }
 
+  if (isLoading && !formData.firstName) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '60vh',
+        }}
+      >
+        <Box sx={{ textAlign: 'center' }}>
+          <CircularProgress sx={{ mb: 2 }} />
+          <Typography>Loading your profile...</Typography>
+        </Box>
+      </Box>
+    )
+  }
+
   if (success) {
     return (
       <Box
@@ -247,6 +332,12 @@ export default function Onboarding() {
           <Typography variant="body1" sx={{ mb: 3, color: 'textSecondary' }}>
             So we understand and can help you better.
           </Typography>
+
+          {fetchError && (
+            <Alert severity="warning" sx={{ mb: 3 }}>
+              {fetchError}
+            </Alert>
+          )}
 
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>

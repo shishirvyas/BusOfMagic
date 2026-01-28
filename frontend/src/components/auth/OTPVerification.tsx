@@ -13,6 +13,7 @@ import {
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import LockIcon from '@mui/icons-material/Lock'
+import { useAuth } from '@context/AuthContext'
 
 interface OTPVerificationProps {
   contactType: 'email' | 'mobile'
@@ -31,6 +32,7 @@ export default function OTPVerification({
   onEdit,
   isLoading = false,
 }: OTPVerificationProps) {
+  const { setCandidateData } = useAuth()
   const [otp, setOtp] = useState('')
   const [error, setError] = useState('')
   const [resendTimer, setResendTimer] = useState(OTP_RESEND_TIME)
@@ -59,6 +61,12 @@ export default function OTPVerification({
       setError('OTP must be at least 4 digits')
       return
     }
+
+    // Save registration method and contact to context
+    setCandidateData({
+      registrationMethod: contactType === 'email' ? 'email' : 'phone',
+      registrationContact: contact,
+    })
 
     // Let backend validate the OTP
     onVerify(otp)
