@@ -1,0 +1,43 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.0'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.magicbus'
+version = '1.0.0'
+description = 'Spring Boot API for Magic Bus Admin Dashboard'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Spring Boot Web
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// Spring Boot Data JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	
+	// H2 Database (for development)
+	runtimeOnly 'com.h2database:h2'
+	
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	// Spring Boot DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// Testing
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+springBoot {
+	mainClass = 'com.magicbus.MagicBusApplication'
+}
