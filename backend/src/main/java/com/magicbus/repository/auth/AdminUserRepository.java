@@ -14,7 +14,14 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     
     Optional<AdminUser> findByUsername(String username);
     
-    Optional<AdminUser> findByUsernameAndPassword(String username, String password);
+    @Query("SELECT a FROM AdminUser a " +
+           "LEFT JOIN FETCH a.role r " +
+           "LEFT JOIN FETCH r.permissions " +
+           "LEFT JOIN FETCH a.state " +
+           "LEFT JOIN FETCH a.city " +
+           "WHERE a.username = :username AND a.password = :password")
+    Optional<AdminUser> findByUsernameAndPassword(@Param("username") String username, 
+                                                   @Param("password") String password);
     
     boolean existsByUsername(String username);
     
@@ -32,5 +39,11 @@ public interface AdminUserRepository extends JpaRepository<AdminUser, Long> {
     @Query("SELECT a FROM AdminUser a WHERE a.role.name = :roleName")
     List<AdminUser> findByRoleName(@Param("roleName") String roleName);
     
-    Optional<AdminUser> findByAuthToken(String authToken);
+    @Query("SELECT a FROM AdminUser a " +
+           "LEFT JOIN FETCH a.role r " +
+           "LEFT JOIN FETCH r.permissions " +
+           "LEFT JOIN FETCH a.state " +
+           "LEFT JOIN FETCH a.city " +
+           "WHERE a.authToken = :authToken")
+    Optional<AdminUser> findByAuthToken(@Param("authToken") String authToken);
 }

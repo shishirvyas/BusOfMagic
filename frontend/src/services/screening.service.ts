@@ -13,6 +13,8 @@ export interface CandidateWorkflowDTO {
   city: string
   state: string
   gender: string
+  engagementScore: number | null
+  dropoutRiskScore: number | null
   status: string
   statusDisplayName: string
   screeningCompletedAt: string | null

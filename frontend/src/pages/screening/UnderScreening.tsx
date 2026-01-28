@@ -168,6 +168,7 @@ export default function UnderScreening() {
                   <TableCell><strong>City</strong></TableCell>
                   <TableCell><strong>Gender</strong></TableCell>
                   <TableCell><strong>Registered On</strong></TableCell>
+                  <TableCell align="center"><strong>Dropout Score</strong></TableCell>
                   <TableCell align="center"><strong>Actions</strong></TableCell>
                 </TableRow>
               </TableHead>
@@ -193,6 +194,14 @@ export default function UnderScreening() {
                       </TableCell>
                       <TableCell>{formatDate(candidate.createdAt)}</TableCell>
                       <TableCell align="center">
+                        <Chip
+                          label={candidate.engagementScore ? candidate.engagementScore.toFixed(1) : '-'}
+                          color={candidate.engagementScore && candidate.engagementScore >= 60 ? 'success' : candidate.engagementScore && candidate.engagementScore >= 40 ? 'warning' : 'error'}
+                          size="small"
+                          variant="filled"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
                         <Tooltip title="View & Process">
                           <IconButton 
                             color="primary" 
@@ -206,7 +215,7 @@ export default function UnderScreening() {
                   ))}
                 {filteredCandidates.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
+                    <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
                       <Typography color="text.secondary">
                         No candidates pending screening
                       </Typography>

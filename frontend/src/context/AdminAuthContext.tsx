@@ -2,11 +2,27 @@ import { createContext, useContext, useState, useEffect, ReactNode, useCallback 
 import { LoginResponse, MenuItem } from '@/types/auth.types';
 import { authApi, menuApi } from '@/services/auth.service';
 
+// User context type for state/city mapping
+export interface UserContext {
+  userId: number;
+  username: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  roleName: string;
+  stateId?: number;
+  stateName?: string;
+  cityId?: number;
+  cityName?: string;
+  permissions: string[];
+}
+
 interface AdminAuthContextType {
   // Auth state
   isAuthenticated: boolean;
   isLoading: boolean;
   user: LoginResponse | null;
+  userContext: UserContext | null;
   permissions: string[];
   menuItems: MenuItem[];
   
@@ -23,6 +39,12 @@ interface AdminAuthContextType {
   isSuperAdmin: () => boolean;
   isStateAdmin: () => boolean;
   isCityAdmin: () => boolean;
+  
+  // Location checks
+  getUserStateId: () => number | null;
+  getUserStateName: () => string | null;
+  getUserCityId: () => number | null;
+  getUserCityName: () => string | null;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -32,14 +54,33 @@ const STORAGE_KEYS = {
   USER: 'adminUser',
   USER_ID: 'adminUserId',
   PERMISSIONS: 'adminPermissions',
+  USER_CONTEXT: 'adminUserContext',
 };
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<LoginResponse | null>(null);
+  const [userContext, setUserContext] = useState<UserContext | null>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+
+  // Build user context from login response
+  const buildUserContext = (response: LoginResponse): UserContext => {
+    return {
+      userId: response.userId,
+      username: response.username,
+      firstName: response.firstName,
+      lastName: response.lastName,
+      email: response.email,
+      roleName: response.roleName,
+      stateId: response.stateId,
+      stateName: response.stateName,
+      cityId: response.cityId,
+      cityName: response.cityName,
+      permissions: response.permissions || [],
+    };
+  };
 
   // Load user from localStorage on mount
   useEffect(() => {
@@ -47,12 +88,20 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       try {
         const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
         const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+        const storedContext = localStorage.getItem(STORAGE_KEYS.USER_CONTEXT);
         
         if (storedUser && storedToken) {
           const parsedUser = JSON.parse(storedUser) as LoginResponse;
           setUser(parsedUser);
           setPermissions(parsedUser.permissions || []);
           setIsAuthenticated(true);
+          
+          // Restore user context
+          if (storedContext) {
+            setUserContext(JSON.parse(storedContext) as UserContext);
+          } else {
+            setUserContext(buildUserContext(parsedUser));
+          }
           
           // Fetch menu items
           await fetchMenuItems();
@@ -84,15 +133,22 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       const response = await authApi.login({ username, password });
       
       if (response.token) {
+        // Build user context
+        const context = buildUserContext(response);
+        
         // Store auth data
         localStorage.setItem(STORAGE_KEYS.TOKEN, response.token);
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response));
         localStorage.setItem(STORAGE_KEYS.USER_ID, response.userId.toString());
         localStorage.setItem(STORAGE_KEYS.PERMISSIONS, response.permissions.join(','));
+        localStorage.setItem(STORAGE_KEYS.USER_CONTEXT, JSON.stringify(context));
         
         setUser(response);
+        setUserContext(context);
         setPermissions(response.permissions || []);
         setIsAuthenticated(true);
+        
+        console.log('User logged in with context:', context);
         
         // Fetch menu items after login
         await fetchMenuItems();
@@ -114,7 +170,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_KEYS.USER);
     localStorage.removeItem(STORAGE_KEYS.USER_ID);
     localStorage.removeItem(STORAGE_KEYS.PERMISSIONS);
+    localStorage.removeItem(STORAGE_KEYS.USER_CONTEXT);
     setUser(null);
+    setUserContext(null);
     setPermissions([]);
     setMenuItems([]);
     setIsAuthenticated(false);
@@ -156,10 +214,28 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return user?.roleName === 'CITY_ADMIN';
   }, [user]);
 
+  // Location getter functions
+  const getUserStateId = useCallback((): number | null => {
+    return userContext?.stateId ?? null;
+  }, [userContext]);
+
+  const getUserStateName = useCallback((): string | null => {
+    return userContext?.stateName ?? null;
+  }, [userContext]);
+
+  const getUserCityId = useCallback((): number | null => {
+    return userContext?.cityId ?? null;
+  }, [userContext]);
+
+  const getUserCityName = useCallback((): string | null => {
+    return userContext?.cityName ?? null;
+  }, [userContext]);
+
   const value: AdminAuthContextType = {
     isAuthenticated,
     isLoading,
     user,
+    userContext,
     permissions,
     menuItems,
     login,
@@ -170,6 +246,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     isSuperAdmin,
     isStateAdmin,
     isCityAdmin,
+    getUserStateId,
+    getUserStateName,
+    getUserCityId,
+    getUserCityName,
   };
 
   return (

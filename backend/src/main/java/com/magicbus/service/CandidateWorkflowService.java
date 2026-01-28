@@ -244,6 +244,8 @@ public class CandidateWorkflowService {
                 .city(candidate.getCity())
                 .state(candidate.getState())
                 .gender(candidate.getGender())
+                .engagementScore(candidate.getEngagementScore())
+                .dropoutRiskScore(candidate.getDropoutRiskScore())
                 .status(workflow.getStatus())
                 .statusDisplayName(workflow.getStatus().getDisplayName())
                 .screeningCompletedAt(workflow.getScreeningCompletedAt())

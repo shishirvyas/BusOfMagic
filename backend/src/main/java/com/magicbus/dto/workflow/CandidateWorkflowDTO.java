@@ -2,6 +2,7 @@ package com.magicbus.dto.workflow;
 
 import com.magicbus.entity.workflow.WorkflowStatus;
 import lombok.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -22,6 +23,10 @@ public class CandidateWorkflowDTO {
     private String city;
     private String state;
     private String gender;
+    
+    // Scores
+    private BigDecimal engagementScore;
+    private BigDecimal dropoutRiskScore;
     
     // Workflow status
     private WorkflowStatus status;

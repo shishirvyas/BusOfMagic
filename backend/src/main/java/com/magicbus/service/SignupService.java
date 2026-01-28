@@ -6,6 +6,7 @@ import com.magicbus.entity.workflow.CandidateWorkflow;
 import com.magicbus.entity.workflow.WorkflowStatus;
 import com.magicbus.repository.*;
 import com.magicbus.repository.workflow.CandidateWorkflowRepository;
+import com.magicbus.util.ScoreUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -149,6 +150,8 @@ public class SignupService {
                         .state("PENDING")
                         .pincode("PENDING")
                         .dateOfBirth(LocalDate.now())
+                        .engagementScore(ScoreUtils.getEngagementScore())
+                        .dropoutRiskScore(ScoreUtils.getDropoutRiskScore())
                         .createdAt(now)
                         .updatedAt(now)
                         .build();
@@ -169,6 +172,8 @@ public class SignupService {
                         .state("PENDING")
                         .pincode("PENDING")
                         .dateOfBirth(LocalDate.now())
+                        .engagementScore(ScoreUtils.getEngagementScore())
+                        .dropoutRiskScore(ScoreUtils.getDropoutRiskScore())
                         .createdAt(now)
                         .updatedAt(now)
                         .build();
@@ -461,6 +466,17 @@ public class SignupService {
         // Update candidate status to ACTIVE and onboarding status to COMPLETED
         candidate.setStatus("ACTIVE");
         candidate.setOnboardingStatus("COMPLETED");
+        
+        // Populate engagement and dropout risk scores if not already set
+        if (candidate.getEngagementScore() == null || candidate.getEngagementScore().compareTo(java.math.BigDecimal.ZERO) == 0) {
+            candidate.setEngagementScore(ScoreUtils.getEngagementScore());
+            log.info("Set engagement score for candidate {}: {}", candidateId, candidate.getEngagementScore());
+        }
+        if (candidate.getDropoutRiskScore() == null || candidate.getDropoutRiskScore().compareTo(java.math.BigDecimal.ZERO) == 0) {
+            candidate.setDropoutRiskScore(ScoreUtils.getDropoutRiskScore());
+            log.info("Set dropout risk score for candidate {}: {}", candidateId, candidate.getDropoutRiskScore());
+        }
+        
         candidate.setUpdatedAt(LocalDateTime.now());
         candidateRepository.save(candidate);
         
