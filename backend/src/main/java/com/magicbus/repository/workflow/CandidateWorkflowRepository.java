@@ -38,5 +38,17 @@ public interface CandidateWorkflowRepository extends JpaRepository<CandidateWork
     @Query("SELECT COUNT(cw) FROM CandidateWorkflow cw WHERE cw.status = :status")
     Long countByStatus(@Param("status") WorkflowStatus status);
 
+    @Query("SELECT COUNT(cw) FROM CandidateWorkflow cw WHERE cw.status = :status " +
+           "AND YEAR(cw.createdAt) = :year AND MONTH(cw.createdAt) = :month")
+    Long countByStatusAndMonth(@Param("status") WorkflowStatus status, 
+                               @Param("year") int year, 
+                               @Param("month") int month);
+    
+    // Count by status and year only
+    @Query("SELECT COUNT(cw) FROM CandidateWorkflow cw WHERE cw.status = :status " +
+           "AND YEAR(cw.createdAt) = :year")
+    Long countByStatusAndYear(@Param("status") WorkflowStatus status, 
+                              @Param("year") int year);
+
     boolean existsByCandidateId(Long candidateId);
 }

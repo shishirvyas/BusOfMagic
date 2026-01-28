@@ -1,6 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginResponse, MenuItem } from '@/types/auth.types';
 import { authApi, menuApi } from '@/services/auth.service';
+import { onSessionExpired, clearAuthData } from '@/utils/api';
 
 // User context type for state/city mapping
 export interface UserContext {
@@ -81,6 +83,24 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       permissions: response.permissions || [],
     };
   };
+
+  // Handle session expiration - redirect to login
+  const handleSessionExpired = useCallback(() => {
+    console.log('Session expired - redirecting to login');
+    setUser(null);
+    setUserContext(null);
+    setPermissions([]);
+    setMenuItems([]);
+    setIsAuthenticated(false);
+    // Redirect to login page
+    window.location.href = '/login?expired=true';
+  }, []);
+
+  // Listen for session expiration events
+  useEffect(() => {
+    const unsubscribe = onSessionExpired(handleSessionExpired);
+    return unsubscribe;
+  }, [handleSessionExpired]);
 
   // Load user from localStorage on mount
   useEffect(() => {

@@ -29,4 +29,24 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     // Find candidates at risk
     @Query("SELECT c FROM Candidate c WHERE c.dropoutRiskScore >= :riskThreshold ORDER BY c.dropoutRiskScore DESC")
     List<Candidate> findAtRiskCandidates(@Param("riskThreshold") Integer riskThreshold);
+    
+    // Count by onboarding status
+    Long countByOnboardingStatus(String onboardingStatus);
+    
+    // Count by onboarding status and month/year
+    @Query("SELECT COUNT(c) FROM Candidate c WHERE c.onboardingStatus = :status " +
+           "AND YEAR(c.createdAt) = :year AND MONTH(c.createdAt) = :month")
+    Long countByOnboardingStatusAndMonth(@Param("status") String status, 
+                                         @Param("year") int year, 
+                                         @Param("month") int month);
+    
+    // Count by onboarding status and year only
+    @Query("SELECT COUNT(c) FROM Candidate c WHERE c.onboardingStatus = :status " +
+           "AND YEAR(c.createdAt) = :year")
+    Long countByOnboardingStatusAndYear(@Param("status") String status, 
+                                        @Param("year") int year);
+    
+    // Count all candidates by year
+    @Query("SELECT COUNT(c) FROM Candidate c WHERE YEAR(c.createdAt) = :year")
+    Long countByYear(@Param("year") int year);
 }
