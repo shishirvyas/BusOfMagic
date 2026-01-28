@@ -7,6 +7,7 @@ import Layout from '@components/layout/Layout'
 import Dashboard from '@pages/Dashboard'
 import Customers from '@pages/Customers'
 import Settings from '@pages/Settings'
+import Locations from '@pages/Locations'
 import IndividualSignup from '@pages/auth/IndividualSignup'
 import Onboarding from '@pages/Onboarding'
 
@@ -43,6 +44,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="customers" element={<Customers />} />
+            <Route path="locations" element={<Locations />} />
             <Route path="settings" element={<Settings />} />
           </Route>
         </Routes>

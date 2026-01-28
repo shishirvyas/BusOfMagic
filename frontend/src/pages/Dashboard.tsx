@@ -1,14 +1,27 @@
-import { Grid, Card, CardContent, Typography, Box } from '@mui/material'
+import { Grid, Card, CardContent, Typography, Box, Button } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { LocationCity as LocationIcon } from '@mui/icons-material'
 import StatCard from '@components/dashboard/StatCard'
 import CustomerTable from '@components/dashboard/CustomerTable'
 import TrendChart from '@components/dashboard/TrendChart'
 
 export default function Dashboard() {
+  const navigate = useNavigate()
+  
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Dashboard
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h4">
+          Dashboard
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<LocationIcon />}
+          onClick={() => navigate('/locations')}
+        >
+          Manage States & Cities
+        </Button>
+      </Box>
 
       {/* Stats Grid */}
       <Grid container spacing={3} sx={{ mb: 3 }}>

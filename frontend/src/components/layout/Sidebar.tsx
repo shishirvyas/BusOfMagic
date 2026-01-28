@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
 import SettingsIcon from '@mui/icons-material/Settings'
+import LocationCityIcon from '@mui/icons-material/LocationCity'
 import CloseIcon from '@mui/icons-material/Close'
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ const MINI_DRAWER_WIDTH = 72
 const menuItems = [
   { label: 'Dashboard', icon: DashboardIcon, path: '/dashboard' },
   { label: 'Customers', icon: PeopleIcon, path: '/customers' },
+  { label: 'Locations', icon: LocationCityIcon, path: '/locations' },
   { label: 'Settings', icon: SettingsIcon, path: '/settings' },
 ]
 
