@@ -15,9 +15,17 @@ import PersonalDetailsForm from '@components/onboarding/PersonalDetailsForm'
 import EducationDetailsForm from '@components/onboarding/EducationDetailsForm'
 import SkillsForm from '@components/onboarding/SkillsForm'
 import ReviewForm from '@components/onboarding/ReviewForm'
+import QuestionsForm from '@components/onboarding/QuestionsForm'
 import { useAuth } from '@context/AuthContext'
 
-type OnboardingStep = 'personal' | 'education' | 'skills' | 'review'
+type OnboardingStep = 'personal' | 'education' | 'skills' | 'review' | 'questions'
+
+interface Answer {
+  questionId: number
+  answerText?: string
+  answerArray?: string[]
+  ratingScore?: number
+}
 
 interface OnboardingData {
   candidateId?: number
@@ -59,7 +67,7 @@ interface OnboardingData {
   isEmailReadOnly: boolean
 }
 
-const STEPS: OnboardingStep[] = ['personal', 'education', 'skills', 'review']
+const STEPS: OnboardingStep[] = ['personal', 'education', 'skills', 'review', 'questions']
 
 export default function Onboarding() {
   const { candidateId, registrationMethod, registrationContact, firstName: ctxFirstName, lastName: ctxLastName, dateOfBirth: ctxDateOfBirth, setCandidateData } = useAuth()
@@ -68,6 +76,8 @@ export default function Onboarding() {
   const [fetchError, setFetchError] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [questionAnswers, setQuestionAnswers] = useState<Answer[]>([])
+  const [isQuestionsValid, setIsQuestionsValid] = useState(false)
   const [formData, setFormData] = useState<OnboardingData>({
     firstName: ctxFirstName || '',
     lastName: ctxLastName || '',
@@ -156,10 +166,14 @@ export default function Onboarding() {
     setFormData((prev) => ({ ...prev, ...stepData }))
 
     if (activeStep < STEPS.length - 1) {
+      // If we're on review step (index 3), save all data first before moving to questions
+      if (activeStep === 3) {
+        await handleSaveAllData(stepData)
+      }
       setActiveStep((prev) => prev + 1)
     } else {
-      // Submit form
-      await handleSubmit(stepData)
+      // On questions step - submit answers and complete
+      await handleSubmitQuestions()
     }
   }
 
@@ -167,14 +181,14 @@ export default function Onboarding() {
     setActiveStep((prev) => Math.max(0, prev - 1))
   }
 
-  const handleSubmit = async (finalStepData: Partial<OnboardingData>) => {
+  const handleSaveAllData = async (stepData: Partial<OnboardingData>) => {
     setIsLoading(true)
     try {
-      const finalData = { ...formData, ...finalStepData }
+      const finalData = { ...formData, ...stepData }
 
       // Get candidateId from localStorage (set after OTP verification)
-      const candidateId = finalData.candidateId || localStorage.getItem('candidateId')
-      if (!candidateId) {
+      const candId = finalData.candidateId || localStorage.getItem('candidateId')
+      if (!candId) {
         throw new Error('Candidate ID not found. Please start from signup.')
       }
 
@@ -185,7 +199,7 @@ export default function Onboarding() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          candidateId: Number(candidateId),
+          candidateId: Number(candId),
           firstName: finalData.firstName,
           lastName: finalData.lastName,
           email: finalData.email,
@@ -214,7 +228,7 @@ export default function Onboarding() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          candidateId: Number(candidateId),
+          candidateId: Number(candId),
           education10th: finalData.education10th,
           score10th: finalData.score10th,
           education12th: finalData.education12th,
@@ -237,7 +251,7 @@ export default function Onboarding() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          candidateId: Number(candidateId),
+          candidateId: Number(candId),
           skills: finalData.skills.map((skill: string) => ({
             skillName: skill,
             proficiencyLevel: 'INTERMEDIATE',
@@ -253,9 +267,43 @@ export default function Onboarding() {
         const errorData = await skillsResponse.json()
         throw new Error(errorData.message || 'Failed to save skills and languages')
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-      // Step 4: Complete Signup
-      let completeResponse = await fetch(`/api/signup/complete?candidateId=${candidateId}`, {
+  const handleSubmitQuestions = async () => {
+    setIsLoading(true)
+    try {
+      const candId = formData.candidateId || localStorage.getItem('candidateId')
+      if (!candId) {
+        throw new Error('Candidate ID not found. Please start from signup.')
+      }
+
+      // Submit answers
+      if (questionAnswers.length > 0) {
+        const answersResponse = await fetch('/api/onboarding/answers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            candidateId: Number(candId),
+            answers: questionAnswers,
+          }),
+        })
+
+        if (!answersResponse.ok) {
+          const errorData = await answersResponse.json()
+          throw new Error(errorData.message || 'Failed to save answers')
+        }
+      }
+
+      // Complete Signup
+      let completeResponse = await fetch(`/api/signup/complete?candidateId=${candId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -268,7 +316,6 @@ export default function Onboarding() {
       }
 
       setSuccess(true)
-      // No redirect - show thank you message instead
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -391,7 +438,10 @@ export default function Onboarding() {
               <StepLabel>Skills</StepLabel>
             </Step>
             <Step>
-              <StepLabel>Review & Submit</StepLabel>
+              <StepLabel>Review</StepLabel>
+            </Step>
+            <Step>
+              <StepLabel>Questions</StepLabel>
             </Step>
           </Stepper>
 
@@ -424,6 +474,25 @@ export default function Onboarding() {
                 onNext={handleNext}
                 isLoading={isLoading}
               />
+            )}
+            {activeStep === 4 && (
+              <Box>
+                <QuestionsForm
+                  candidateId={Number(formData.candidateId || localStorage.getItem('candidateId'))}
+                  onAnswersChange={setQuestionAnswers}
+                  onValidationChange={setIsQuestionsValid}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleSubmitQuestions()}
+                    disabled={isLoading || !isQuestionsValid}
+                  >
+                    {isLoading ? 'Submitting...' : 'Submit & Complete'}
+                  </Button>
+                </Box>
+              </Box>
             )}
           </Box>
 
