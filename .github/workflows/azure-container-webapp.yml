@@ -48,7 +48,7 @@ jobs:
         cd frontend
         npm install
         # Install @types/node to resolve path module issues
-        npm install --save-dev @types/node
+        npm install @types/node --save-dev
 
     - name: Build Frontend (if needed)
       run: |
