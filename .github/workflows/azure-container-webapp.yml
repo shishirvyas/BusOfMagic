@@ -24,38 +24,47 @@
 # For more information on the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 name: Deploy to Azure App Service
+ame: Deploy to Azure App Service
 
 on:
   push:
     branches:
-      - main  # Trigger deployment on push to main branch
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy-frontend:
     runs-on: ubuntu-latest
-     
+
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set up Node.js (for example, if frontend is React or Angular)
-      uses: actions/setup-node@v2
+    - name: Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
-    - name: Install dependencies for Frontend
-      run: |
-        cd frontend
-        npm install --save-dev vite @vitejs/plugin-react typescript @types/react @types/react-dom
-        npm fund
-        npm audit fix --force
-        npm run build
-        
+    - name: Install dependencies
+      run: cd frontend
+           npm install --save-dev vite @vitejs/plugin-react typescript @types/react @types/react-dom
+           npm fund
+           npm audit fix --force
+           npm run build
+
+    - name: Build React App
+      run: npm run build
+      env:
+        CI: false
+
     - name: Deploy Frontend to Azure App Service
-      uses: azure/webapps-deploy@v2
+      uses: azure/webapps-deploy@v3
       with:
-        app-name: <frontend-app-service-name>  # Replace with your Azure App Service name
-        slot-name: 'production'
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Store this in GitHub secrets
-
-
+        app-name: ${{ secrets.AZURE_FRONTEND_APP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: ./build
