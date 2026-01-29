@@ -94,11 +94,6 @@ export default function Layout() {
             </IconButton>
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1 }}>
-              <img 
-                src="/assets/magic-bus-logo.png" 
-                alt="Magic Bus Logo" 
-                style={{ height: '40px', width: 'auto', objectFit: 'contain' }}
-              />
               <Typography 
                 variant="h6" 
                 sx={{ 
