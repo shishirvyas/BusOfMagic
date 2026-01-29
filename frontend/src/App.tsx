@@ -16,6 +16,7 @@ import IndividualSignup from '@pages/auth/IndividualSignup'
 import Login from '@pages/auth/Login'
 import Unauthorized from '@pages/auth/Unauthorized'
 import Onboarding from '@pages/Onboarding'
+import Notifications from '@pages/Notifications'
 import { AdminManagement, RoleManagement, PermissionManagement } from '@pages/admin'
 import { UnderScreening, Orientation, Enroll } from '@pages/screening'
 import { TrainingMaster, TrainingBatches } from '@pages/training'
@@ -60,6 +61,7 @@ function App() {
                 }>
                   <Route index element={<Navigate to="/dashboard" replace />} />
                   <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="notifications" element={<Notifications />} />
                   <Route path="customers" element={<Customers />} />
                   <Route path="locations" element={<Locations />} />
                   <Route path="settings" element={<Settings />} />

@@ -1,21 +1,66 @@
-import { Box, AppBar, Toolbar, Typography, Container, useMediaQuery, useTheme, IconButton } from '@mui/material'
+import { Box, AppBar, Toolbar, Typography, Container, useMediaQuery, useTheme, IconButton, Badge, Tooltip, Menu, MenuItem, Avatar, Divider, ListItemIcon } from '@mui/material'
 import { useState, useEffect } from 'react'
 import MenuIcon from '@mui/icons-material/Menu'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import LogoutIcon from '@mui/icons-material/Logout'
+import PersonIcon from '@mui/icons-material/Person'
 import Sidebar from './Sidebar'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useNavigate } from 'react-router-dom'
+import { notificationApi } from '@/services/notification.service'
+import { useAdminAuth } from '@/context/AdminAuthContext'
 
 export default function Layout() {
   const theme = useTheme()
+  const navigate = useNavigate()
+  const { user, logout } = useAdminAuth()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
   // Update sidebar state when screen size changes
   useEffect(() => {
     setSidebarOpen(!isMobile)
   }, [isMobile])
 
+  // Fetch unread notification count
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await notificationApi.getUnreadCount()
+        setUnreadCount(count)
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error)
+      }
+    }
+
+    fetchUnreadCount()
+    // Refresh every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [])
+
   const handleToggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
+  }
+
+  const handleNotificationClick = () => {
+    navigate('/notifications')
+  }
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleProfileMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const handleLogout = () => {
+    handleProfileMenuClose()
+    logout()
+    navigate('/login')
   }
 
   return (
@@ -63,6 +108,86 @@ export default function Layout() {
                 Magic Bus Dashboard
               </Typography>
             </Box>
+
+            {/* Notification Bell Icon */}
+            <Tooltip title="Notifications">
+              <IconButton 
+                color="inherit" 
+                onClick={handleNotificationClick}
+              >
+                <Badge 
+                  badgeContent={unreadCount} 
+                  color="error"
+                  max={99}
+                >
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+
+            {/* User Profile Icon */}
+            <Tooltip title="Account">
+              <IconButton
+                color="inherit"
+                onClick={handleProfileMenuOpen}
+                sx={{ ml: 1 }}
+              >
+                <Avatar 
+                  sx={{ 
+                    width: 32, 
+                    height: 32, 
+                    bgcolor: 'secondary.main',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  {user?.username?.charAt(0).toUpperCase() || 'U'}
+                </Avatar>
+              </IconButton>
+            </Tooltip>
+
+            {/* Profile Dropdown Menu */}
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleProfileMenuClose}
+              onClick={handleProfileMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              PaperProps={{
+                elevation: 3,
+                sx: {
+                  mt: 1,
+                  minWidth: 200,
+                  '& .MuiMenuItem-root': {
+                    px: 2,
+                    py: 1,
+                  },
+                },
+              }}
+            >
+              <Box sx={{ px: 2, py: 1.5 }}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {user?.username || 'User'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {user?.roleName || 'Role'}
+                </Typography>
+              </Box>
+              <Divider />
+              <MenuItem onClick={handleProfileMenuClose}>
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                Profile
+              </MenuItem>
+              <Divider />
+              <MenuItem onClick={handleLogout} sx={{ color: 'error.main' }}>
+                <ListItemIcon>
+                  <LogoutIcon fontSize="small" sx={{ color: 'error.main' }} />
+                </ListItemIcon>
+                Logout
+              </MenuItem>
+            </Menu>
           </Toolbar>
         </AppBar>
 

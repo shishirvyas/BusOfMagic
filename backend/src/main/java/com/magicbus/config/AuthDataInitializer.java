@@ -76,7 +76,8 @@ public class AuthDataInitializer implements CommandLineRunner {
             createPermission("SCREENING_VIEW", "View Screening", "View screening candidates", "SCREENING"),
             createPermission("SCREENING_MANAGE", "Manage Screening", "Manage screening workflow", "SCREENING"),
             createPermission("TRAINING_VIEW", "View Training", "View training programs", "TRAINING"),
-            createPermission("TRAINING_MANAGE", "Manage Training", "Manage training programs and batches", "TRAINING")
+            createPermission("TRAINING_MANAGE", "Manage Training", "Manage training programs and batches", "TRAINING"),
+            createPermission("NOTIFICATION_VIEW", "View Notifications", "View onboarding aging notifications", "NOTIFICATION")
         );
 
         for (Permission permission : permissionsToCreate) {
@@ -122,6 +123,7 @@ public class AuthDataInitializer implements CommandLineRunner {
         stateAdminPerms.add(permissions.get("SCREENING_VIEW"));
         stateAdminPerms.add(permissions.get("SCREENING_MANAGE"));
         stateAdminPerms.add(permissions.get("ADMIN_VIEW"));
+        stateAdminPerms.add(permissions.get("NOTIFICATION_VIEW"));
         roleMap.put("STATE_ADMIN", createOrUpdateRole("STATE_ADMIN", 
             "State level administrator", stateAdminPerms));
         
@@ -134,6 +136,7 @@ public class AuthDataInitializer implements CommandLineRunner {
         cityAdminPerms.add(permissions.get("REPORT_VIEW"));
         cityAdminPerms.add(permissions.get("ONBOARDING_VIEW"));
         cityAdminPerms.add(permissions.get("ONBOARDING_MANAGE"));
+        cityAdminPerms.add(permissions.get("NOTIFICATION_VIEW"));
         roleMap.put("CITY_ADMIN", createOrUpdateRole("CITY_ADMIN", 
             "City level administrator", cityAdminPerms));
         
@@ -231,6 +234,8 @@ public class AuthDataInitializer implements CommandLineRunner {
             // Main Group
             createMenuItem("dashboard", "Dashboard", "Dashboard", "/dashboard", 1, 
                 permissions.get("DASHBOARD_VIEW"), menuGroups.get("main")),
+            createMenuItem("notifications", "Notifications", "Notifications", "/notifications", 2, 
+                permissions.get("NOTIFICATION_VIEW"), menuGroups.get("main")),
             
             // Administration Group
             createMenuItem("admin-management", "User Management", "People", "/admin-management", 1, 
