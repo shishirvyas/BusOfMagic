@@ -38,6 +38,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: |
+          {
+             "clientId": "a192e17e-9e89-4c34-83a5-dc99bcce7b99",
+            "clientSecret": "YgA8Q~sYXLFmExPuDeMSapAJe32YKCiUHU_E2apf",
+            "subscriptionId": "ffd3231b-4a12-4760-942d-2762a7395b76",
+           "tenantId": "9ff87383-ae93-4e4b-85fd-e21685c0431c"
+          }
+
+
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
