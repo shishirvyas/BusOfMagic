@@ -44,6 +44,11 @@ interface OnboardingData {
   aadhar: string
   pan: string
   bankAccount: string
+  
+  // Family & Access Information
+  familyAnnualIncome: string
+  hasPhoneAccess: boolean
+  hasComputerAccess: boolean
 
   // Education Details
   education10th: string
@@ -92,6 +97,9 @@ export default function Onboarding() {
     aadhar: '',
     pan: '',
     bankAccount: '',
+    familyAnnualIncome: '',
+    hasPhoneAccess: false,
+    hasComputerAccess: false,
     education10th: '',
     score10th: '',
     education12th: '',

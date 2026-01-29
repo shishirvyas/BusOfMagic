@@ -5,10 +5,14 @@ import NotificationsIcon from '@mui/icons-material/Notifications'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
 import LogoutIcon from '@mui/icons-material/Logout'
 import PersonIcon from '@mui/icons-material/Person'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
+import SearchIcon from '@mui/icons-material/Search'
 import Sidebar from './Sidebar'
 import { Outlet, useNavigate } from 'react-router-dom'
 import { notificationApi } from '@/services/notification.service'
 import { useAdminAuth } from '@/context/AdminAuthContext'
+import HelpModal from '@/components/common/HelpModal'
+import GlobalSearch from '@/components/common/GlobalSearch'
 
 export default function Layout() {
   const theme = useTheme()
@@ -18,6 +22,20 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile)
   const [unreadCount, setUnreadCount] = useState(0)
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+
+  // Keyboard shortcut for search (Ctrl+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
 
   // Update sidebar state when screen size changes
   useEffect(() => {
@@ -104,7 +122,26 @@ export default function Layout() {
               </Typography>
             </Box>
 
-            {/* Notification Bell Icon */}
+            {/* Search Icon */}
+            <Tooltip title="Search (Ctrl+K)">
+              <IconButton 
+                color="inherit" 
+                onClick={() => setSearchOpen(true)}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
+
+            {/* Help Icon */}
+            <Tooltip title="Help">
+              <IconButton 
+                color="inherit" 
+                onClick={() => setHelpOpen(true)}
+              >
+                <HelpOutlineIcon />
+              </IconButton>
+            </Tooltip>
+
             <Tooltip title="Notifications">
               <IconButton 
                 color="inherit" 
@@ -183,6 +220,12 @@ export default function Layout() {
                 Logout
               </MenuItem>
             </Menu>
+
+          {/* Help Modal */}
+          <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+          
+          {/* Global Search */}
+          <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
           </Toolbar>
         </AppBar>
 

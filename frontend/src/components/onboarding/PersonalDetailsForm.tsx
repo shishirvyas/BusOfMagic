@@ -12,6 +12,8 @@ import {
   Typography,
   CircularProgress,
   FormHelperText,
+  Checkbox,
+  FormControlLabel,
 } from '@mui/material'
 import apiClient from '@services/api'
 
@@ -74,7 +76,10 @@ export default function PersonalDetailsForm({
     pincode: data.pincode || '',
     aadhar: data.aadhar || '',
     pan: data.pan || '',
-    bankAccount: data.bankAccount || '',
+    // Family & Access Information
+    familyAnnualIncome: data.familyAnnualIncome || '',
+    hasPhoneAccess: data.hasPhoneAccess || false,
+    hasComputerAccess: data.hasComputerAccess || false,
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -402,14 +407,52 @@ export default function PersonalDetailsForm({
           />
         </Grid>
 
+        {/* Family & Access Information Section */}
+        <Grid item xs={12}>
+          <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'medium', color: 'primary.main' }}>
+            Family & Access Information
+          </Typography>
+        </Grid>
+
         <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Bank Account (Optional)"
-            value={formData.bankAccount}
-            onChange={(e) => handleChange('bankAccount', e.target.value)}
-            placeholder="Account Number"
-          />
+          <FormControl fullWidth>
+            <InputLabel>Family Annual Income</InputLabel>
+            <Select
+              value={formData.familyAnnualIncome}
+              label="Family Annual Income"
+              onChange={(e) => handleChange('familyAnnualIncome', e.target.value)}
+            >
+              <MenuItem value="">Select Income Range</MenuItem>
+              <MenuItem value="Below 1 Lakh">Below ₹1 Lakh</MenuItem>
+              <MenuItem value="1-3 Lakhs">₹1 - 3 Lakhs</MenuItem>
+              <MenuItem value="3-5 Lakhs">₹3 - 5 Lakhs</MenuItem>
+              <MenuItem value="5-10 Lakhs">₹5 - 10 Lakhs</MenuItem>
+              <MenuItem value="Above 10 Lakhs">Above ₹10 Lakhs</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.hasPhoneAccess}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, hasPhoneAccess: e.target.checked }))}
+                />
+              }
+              label="Access to Phone"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={formData.hasComputerAccess}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, hasComputerAccess: e.target.checked }))}
+                />
+              }
+              label="Access to Computer"
+            />
+          </Box>
         </Grid>
 
         <Grid item xs={12} sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>

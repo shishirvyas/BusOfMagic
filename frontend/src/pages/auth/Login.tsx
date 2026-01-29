@@ -172,25 +172,6 @@ export default function Login() {
             </Button>
           </form>
 
-          {/* Demo Credentials Info */}
-          <Box
-            sx={{
-              mt: 3,
-              p: 2,
-              bgcolor: 'grey.100',
-              borderRadius: 1,
-            }}
-          >
-            <Typography variant="caption" color="text.secondary" display="block">
-              <strong>Demo Credentials:</strong>
-            </Typography>
-            <Typography variant="caption" color="text.secondary" display="block">
-              Username: superadmin
-            </Typography>
-            <Typography variant="caption" color="text.secondary" display="block">
-              Password: admin123
-            </Typography>
-          </Box>
         </CardContent>
       </Card>
     </Box>

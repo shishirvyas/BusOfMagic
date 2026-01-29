@@ -286,6 +286,18 @@ public class SignupService {
         personalDetails.setMigrationStatus(dto.getMigrationStatus());
         personalDetails.setAvailabilityToRelocate(dto.getAvailabilityToRelocate());
         personalDetails.setAvailabilityForInternship(dto.getAvailabilityForInternship());
+        
+        // Family & Access Information
+        if (dto.getFamilyAnnualIncome() != null) {
+            personalDetails.setFamilyAnnualIncome(dto.getFamilyAnnualIncome());
+        }
+        if (dto.getHasPhoneAccess() != null) {
+            personalDetails.setHasPhoneAccess(dto.getHasPhoneAccess());
+        }
+        if (dto.getHasComputerAccess() != null) {
+            personalDetails.setHasComputerAccess(dto.getHasComputerAccess());
+        }
+        
         personalDetails.setUpdatedAt(LocalDateTime.now());
         
         personalDetailsRepository.save(personalDetails);

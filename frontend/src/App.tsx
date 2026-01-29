@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
 import { ErrorProvider } from '@context/ErrorContext'
 import { AuthProvider } from '@context/AuthContext'
 import { AdminAuthProvider } from '@context/AdminAuthContext'
+import { ToastProvider } from '@context/ToastContext'
 import ErrorNotification from '@components/common/ErrorNotification'
 import { ProtectedRoute } from '@components/auth'
 import Layout from '@components/layout/Layout'
@@ -17,6 +18,7 @@ import Login from '@pages/auth/Login'
 import Unauthorized from '@pages/auth/Unauthorized'
 import Onboarding from '@pages/Onboarding'
 import Notifications from '@pages/Notifications'
+import Reports from '@pages/Reports'
 import { AdminManagement, RoleManagement, PermissionManagement } from '@pages/admin'
 import { UnderScreening, Orientation, Enroll } from '@pages/screening'
 import { TrainingMaster, TrainingBatches } from '@pages/training'
@@ -42,40 +44,42 @@ function App() {
     <ErrorProvider>
       <AuthProvider>
         <AdminAuthProvider>
-          <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <ErrorNotification />
-            <BrowserRouter>
-              <Routes>
-                {/* Public Auth Routes (without layout) */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/unauthorized" element={<Unauthorized />} />
-                <Route path="/individualsignup" element={<IndividualSignup />} />
-                <Route path="/onboard" element={<Onboarding />} />
+          <ToastProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <ErrorNotification />
+              <BrowserRouter>
+                <Routes>
+                  {/* Public Auth Routes (without layout) */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/unauthorized" element={<Unauthorized />} />
+                  <Route path="/individualsignup" element={<IndividualSignup />} />
+                  <Route path="/onboard" element={<Onboarding />} />
 
-                {/* Protected Dashboard Routes (with layout) */}
-                <Route element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }>
-                  <Route index element={<Navigate to="/dashboard" replace />} />
-                  <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="notifications" element={<Notifications />} />
-                  <Route path="customers" element={<Customers />} />
-                  <Route path="locations" element={<Locations />} />
-                  <Route path="settings" element={<Settings />} />
-                  <Route path="onboarding" element={<Onboarding />} />
-                  
-                  {/* Screening Routes - State Admin Access */}
-                  <Route 
-                    path="under-screening" 
-                    element={
-                      <ProtectedRoute requiredPermission="SCREENING_VIEW">
-                        <UnderScreening />
-                      </ProtectedRoute>
-                    } 
-                  />
+                  {/* Protected Dashboard Routes (with layout) */}
+                  <Route element={
+                    <ProtectedRoute>
+                      <Layout />
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<Navigate to="/dashboard" replace />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="reports" element={<Reports />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="locations" element={<Locations />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="onboarding" element={<Onboarding />} />
+                    
+                    {/* Screening Routes - State Admin Access */}
+                    <Route 
+                      path="under-screening" 
+                      element={
+                        <ProtectedRoute requiredPermission="SCREENING_VIEW">
+                          <UnderScreening />
+                        </ProtectedRoute>
+                      } 
+                    />
                   <Route 
                     path="orientation" 
                     element={
@@ -151,6 +155,7 @@ function App() {
               </Routes>
             </BrowserRouter>
           </ThemeProvider>
+          </ToastProvider>
         </AdminAuthProvider>
       </AuthProvider>
     </ErrorProvider>

@@ -37,6 +37,7 @@ import {
   LineChart,
   Line,
 } from 'recharts'
+import DropoutRiskIndicator from '@/components/dashboard/DropoutRiskIndicator'
 
 interface MonthlyOnboardingData {
   month: number
@@ -296,6 +297,22 @@ export default function Dashboard() {
           </Card>
         </Grid>
       </Grid>
+
+      {/* Dropout Risk Indicator */}
+      {dashboardData && (
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={4}>
+            <DropoutRiskIndicator
+              totalCandidates={dashboardData.totalCandidates}
+              enrolled={dashboardData.enrolled}
+              dropped={dashboardData.dropped}
+              pendingScreening={dashboardData.pendingScreening}
+              pendingOrientation={dashboardData.pendingOrientation}
+              pendingEnroll={dashboardData.pendingEnroll}
+            />
+          </Grid>
+        </Grid>
+      )}
 
       {/* Charts Section */}
       <Grid container spacing={3}>

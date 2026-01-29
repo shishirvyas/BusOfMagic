@@ -47,4 +47,9 @@ public class PersonalDetailsDto {
     private LocalDate earliestJoinDate;
     private Boolean availabilityToRelocate;
     private Boolean availabilityForInternship;
+    
+    // ========== Family & Access Information ==========
+    private String familyAnnualIncome;  // Range-based: "Below 1 Lakh", "1-3 Lakhs", "3-5 Lakhs", "5-10 Lakhs", "Above 10 Lakhs"
+    private Boolean hasPhoneAccess;
+    private Boolean hasComputerAccess;
 }

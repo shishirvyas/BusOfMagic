@@ -84,6 +84,16 @@ public class PersonalDetails {
     
     private Boolean availabilityForInternship = true;
     
+    // Family & Access Information
+    @Column(length = 50)
+    private String familyAnnualIncome;
+    
+    @Builder.Default
+    private Boolean hasPhoneAccess = false;
+    
+    @Builder.Default
+    private Boolean hasComputerAccess = false;
+    
     @Column(updatable = false)
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
