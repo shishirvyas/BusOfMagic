@@ -68,6 +68,6 @@ jobs:
     - name: Deploy Frontend to Azure App Service
       uses: azure/webapps-deploy@v2
       with:
-        app-name: <frontend-app-service-name>  # Replace with your Azure App Service name
+        app-name: recursivekindnessbackend  # Replace with your Azure App Service name
         slot-name: 'production'
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  # Store this in GitHub secrets
